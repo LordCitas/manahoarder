@@ -1,7 +1,28 @@
-{% extends "base.html.twig" %}
+{% extends 'base.html.twig' %}
+
+{% block title %}ManaHoarder - Colección{% endblock %}
 
 {% block body %}
+<div class="example-wrapper">
+    <h1>¡Bienvenido a ManaHoarder! 🃏</h1>
 
-<h1>Welcome</h1>
-
+    {% if card is not null %}
+        <div class="card-display" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; width: 300px;">
+            <h3>{{ card.name }}</h3>
+            <p><strong>Tipo:</strong> {{ card.type_line }}</p>
+            <p><strong>Coste de maná:</strong> {{ card.mana_cost }}</p>
+            
+            {# Renderizamos la imagen de la carta #}
+            {% if card.image_uris is defined %}
+                <img src="{{ card.image_uris.normal }}" alt="{{ card.name }}" style="max-width: 100%; border-radius: 4%;">
+            {% else %}
+                <p>No hay imagen disponible para esta edición.</p>
+            {% endif %}
+            
+            <p style="font-style: italic; margin-top: 10px;">"{{ card.flavor_text|default('Sin texto de ambientación.') }}"</p>
+        </div>
+    {% else %}
+        <p>No se pudo cargar la carta desde Scryfall.</p>
+    {% endif %}
+</div>
 {% endblock %}
