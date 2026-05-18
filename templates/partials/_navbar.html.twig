@@ -1,0 +1,66 @@
+<nav class="fixed top-0 left-0 right-0 h-16 bg-[#121212] border-b border-[#2A2A2A] z-50">
+    <div class="h-full px-6 flex items-center justify-between">
+        
+        {# Left section: Logo/Title and main navigation #}
+        <div class="flex items-center gap-8">
+            {# Website Title/Logo #}
+            <a href="{{ path('app_home') }}" class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk'] text-[#FF8C00] hover:text-[#ff9d26] transition-colors">
+                ManaHoarder
+            </a>
+
+            {# Main Navigation Links #}
+            <div class="hidden md:flex items-center gap-6">
+                <a href="{{ path('app_decks') }}" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-[#FF8C00] transition-colors font-['Space_Grotesk']">
+                    Decks
+                </a>
+                <a href="{{ path('app_collection') }}" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-[#FF8C00] transition-colors font-['Space_Grotesk']">
+                    Collection
+                </a>
+            </div>
+        </div>
+
+        {# Right section: Search, Icons #}
+        <div class="flex items-center gap-4">
+            {# Quick Search Bar #}
+            <div class="hidden lg:block">
+                <input 
+                    type="search" 
+                    placeholder="Quick search..." 
+                    class="bg-[#1A1B1E] border border-[#2A2A2A] py-2 px-4 text-xs text-zinc-300 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none w-64"
+                >
+            </div>
+
+            {# Icons Section #}
+            <div class="flex items-center gap-3">
+                {# Search Icon (mobile) #}
+                <button class="lg:hidden text-zinc-400 hover:text-[#FF8C00] transition-colors">
+                    <span class="material-symbols-outlined text-xl">search</span>
+                </button>
+
+                {# Notifications Icon #}
+                <button class="text-zinc-400 hover:text-[#FF8C00] transition-colors relative">
+                    <span class="material-symbols-outlined text-xl">notifications</span>
+                    {# Notification badge (optional) #}
+                    {# <span class="absolute top-0 right-0 w-2 h-2 bg-[#FF8C00] rounded-full"></span> #}
+                </button>
+
+                {# Settings Icon #}
+                <a href="{{ path('app_settings') }}" class="text-zinc-400 hover:text-[#FF8C00] transition-colors">
+                    <span class="material-symbols-outlined text-xl">settings</span>
+                </a>
+
+                {# Profile Icon #}
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <a href="{{ path('app_profile') }}" class="text-zinc-400 hover:text-[#FF8C00] transition-colors">
+                        <span class="material-symbols-outlined text-xl">account_circle</span>
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="text-zinc-400 hover:text-[#FF8C00] transition-colors">
+                        <span class="material-symbols-outlined text-xl">login</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</nav>
