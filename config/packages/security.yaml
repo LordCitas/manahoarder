@@ -23,6 +23,7 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                default_target_path: app_home
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -36,6 +37,8 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
