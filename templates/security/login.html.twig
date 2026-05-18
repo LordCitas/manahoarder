@@ -1,38 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Iniciar sesión - ManaHoarder{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+<main class="ml-20 md:ml-64 pt-16 h-screen overflow-y-auto">
+    <div class="p-6">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
-            </div>
-        {% endif %}
+            <section class="border border-[#2A2A2A] bg-[#121212] p-6">
+                <h1 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk'] text-[#FF8C00]">Iniciar sesión</h1>
+                <p class="mt-2 text-zinc-500 text-sm">Accede a tu cuenta para gestionar tus listas y mazos.</p>
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                {% if error %}
+                    <div class="mt-4 border border-red-900/60 bg-red-900/20 px-4 py-3 text-sm text-red-100">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+                <form method="post" class="mt-6 space-y-4">
+                    <div>
+                        <label for="inputEmail" class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1">Email</label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" placeholder="tu@email.com" class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" autocomplete="email" required autofocus>
+                    </div>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
+                    <div>
+                        <label for="inputPassword" class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1">Contraseña</label>
+                        <input type="password" name="_password" id="inputPassword" placeholder="tu contraseña" class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" autocomplete="current-password" required>
+                    </div>
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button type="submit" class="w-full bg-[#FF8C00] text-black py-3 text-[10px] font-black uppercase tracking-widest rounded hover:bg-[#ff9d26] transition-colors">
+                        Entrar
+                    </button>
+
+                    <p class="text-xs text-zinc-500">
+                        ¿No tienes cuenta?
+                        <a class="text-[#FF8C00] font-bold hover:underline" href="{{ path('app_register') }}">Regístrate</a>.
+                    </p>
+                </form>
+            </section>
+
+            <section class="border border-[#2A2A2A] bg-[#1A1B1E]/50 p-6">
+                <h2 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk']">¿Nuevo aquí?</h2>
+                <p class="mt-2 text-zinc-500 text-sm">Crea una cuenta gratis y empieza a construir tus mazos.</p>
+
+                <div class="mt-6 space-y-3">
+                    <div class="border border-[#2A2A2A] bg-[#121212] p-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-[#FF8C00]">person_add</span>
+                            <div>
+                                <div class="text-xs font-bold uppercase tracking-widest text-zinc-200 font-['Space_Grotesk']">Registro rápido</div>
+                                <div class="mt-1 text-sm text-zinc-500">Solo necesitas un email y contraseña para empezar.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a class="block text-center bg-[#FF8C00] text-black px-4 py-3 text-[10px] font-black uppercase tracking-widest rounded hover:bg-[#ff9d26] transition-colors" href="{{ path('app_register') }}">
+                        Crear cuenta
+                    </a>
+
+                    <a class="block text-center border border-[#2A2A2A] px-4 py-3 text-[10px] font-black uppercase tracking-widest text-zinc-300 hover:bg-zinc-800 transition-colors rounded" href="{{ path('app_home') }}">
+                        Volver al inicio
+                    </a>
+
+                    <p class="text-[11px] text-zinc-500">
+                        Más adelante podremos añadir OAuth (Google/Discord) si te interesa.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</main>
 {% endblock %}
