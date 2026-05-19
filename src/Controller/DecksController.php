@@ -11,6 +11,12 @@ class DecksController extends AbstractController
     #[Route('/decks', name: 'app_decks')]
     public function index(): Response
     {
-        return $this->render('decks/index.html.twig');
+        // TODO: Fetch user's decks from database
+        // For now, passing empty array to show empty state
+        $decks = [];
+        
+        return $this->render('deck/index.html.twig', [
+            'decks' => $decks,
+        ]);
     }
 }

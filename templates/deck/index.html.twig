@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Decks - ManaHoarder{% endblock %}
+
+{% block body %}
+<main class="min-h-screen">
+    <div class="max-w-[1440px] mx-auto p-8 lg:p-12">
+        <!-- Header Section -->
+        <div class="mb-10 flex justify-between items-start">
+            <div>
+                <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">Deck Arsenal</h1>
+                <p class="text-zinc-400 max-w-2xl">Manage your competitive deck library and optimize your strategies.</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-5 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">upload_file</span>
+                    Import Decklist
+                </button>
+                <button class="bg-[#FF8C00] text-black px-5 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Create New Deck
+                </button>
+            </div>
+        </div>
+
+        {% if decks is defined and decks|length > 0 %}
+            <!-- Filters and Search Bar -->
+            <div class="mb-8 bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Search Bar -->
+                    <div class="lg:col-span-5">
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-2">Search Decks</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">search</span>
+                            <input 
+                                type="text" 
+                                placeholder="Search by name..." 
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-3 pl-10 pr-3 text-xs text-zinc-300 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Format Filter -->
+                    <div class="lg:col-span-3">
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-2">Format</label>
+                        <select class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs text-zinc-300 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded">
+                            <option value="">All Formats</option>
+                            <option value="standard">Standard</option>
+                            <option value="modern">Modern</option>
+                            <option value="commander">Commander</option>
+                            <option value="legacy">Legacy</option>
+                            <option value="vintage">Vintage</option>
+                            <option value="pioneer">Pioneer</option>
+                        </select>
+                    </div>
+
+                    <!-- Color Filter -->
+                    <div class="lg:col-span-4">
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-2">Color Identity</label>
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-[#121212] border border-[#2A2A2A] py-3 px-2 rounded hover:border-white/50 transition-all group" title="White">
+                                <div class="w-5 h-5 rounded-full bg-yellow-50 border border-white/20 mx-auto group-hover:scale-110 transition-transform"></div>
+                            </button>
+                            <button class="flex-1 bg-[#121212] border border-[#2A2A2A] py-3 px-2 rounded hover:border-blue-500/50 transition-all group" title="Blue">
+                                <div class="w-5 h-5 rounded-full bg-blue-600 border border-white/20 mx-auto group-hover:scale-110 transition-transform"></div>
+                            </button>
+                            <button class="flex-1 bg-[#121212] border border-[#2A2A2A] py-3 px-2 rounded hover:border-purple-500/50 transition-all group" title="Black">
+                                <div class="w-5 h-5 rounded-full bg-purple-900 border border-white/20 mx-auto group-hover:scale-110 transition-transform"></div>
+                            </button>
+                            <button class="flex-1 bg-[#121212] border border-[#2A2A2A] py-3 px-2 rounded hover:border-red-500/50 transition-all group" title="Red">
+                                <div class="w-5 h-5 rounded-full bg-red-600 border border-white/20 mx-auto group-hover:scale-110 transition-transform"></div>
+                            </button>
+                            <button class="flex-1 bg-[#121212] border border-[#2A2A2A] py-3 px-2 rounded hover:border-green-500/50 transition-all group" title="Green">
+                                <div class="w-5 h-5 rounded-full bg-green-600 border border-white/20 mx-auto group-hover:scale-110 transition-transform"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Filters Display -->
+                <div class="mt-4 flex items-center gap-2 flex-wrap">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk']">Active Filters:</span>
+                    <span class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded-full text-[10px] font-['Space_Grotesk'] text-zinc-400 flex items-center gap-2">
+                        Commander
+                        <button class="text-zinc-500 hover:text-white">×</button>
+                    </span>
+                    <button class="text-[10px] font-bold uppercase tracking-widest text-[#FF8C00] font-['Space_Grotesk'] hover:underline">Clear All</button>
+                </div>
+            </div>
+
+            <!-- Deck Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for deck in decks %}
+                    <div class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded p-1 flex flex-col group">
+                        <div class="relative h-48 overflow-hidden rounded-sm mb-4">
+                            <img alt="{{ deck.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="{{ deck.image ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4WEZRJoV1QlcF8X5gtasBf8lir_Y-8bks8KWyVRkLVyKIn-eBnMXFWK-VIPA86xec-QtRzV1BkbMwzE7HNRl6MCe-KG6cC8f_hPbxdUteQPQgesn1mmuixI3NPusk6OdPtNZh5NjkTk_-1fq78qNJsPLXFlBGhtXBJ5RIcVSl8FBlgURW_vk1XchnQ5ceggmMJCiLS4d-GW47RBLmxlbPHzfM30LQ-beuo8fDZork82qHJRyEMg06CIG6dpFi3iCCHNRHv5k__uWQ' }}"/>
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] font-['Space_Grotesk'] text-[#FF8C00] border border-[#FF8C00]/30 uppercase">
+                                {{ deck.format ?? 'Standard' }}
+                            </div>
+                            <div class="absolute top-2 left-2 flex gap-1">
+                                {% if deck.colors is defined %}
+                                    {% for color in deck.colors %}
+                                        <div class="w-4 h-4 rounded-full border border-white/30 {{ color == 'W' ? 'bg-yellow-50' : color == 'U' ? 'bg-blue-600' : color == 'B' ? 'bg-purple-900' : color == 'R' ? 'bg-red-600' : 'bg-green-600' }}"></div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="px-3 pb-4 flex-1 flex flex-col">
+                            <h3 class="font-['Space_Grotesk'] text-lg font-semibold text-white mb-1">{{ deck.name }}</h3>
+                            <p class="text-[10px] font-['Space_Grotesk'] text-zinc-500 uppercase tracking-wider mb-4">{{ deck.archetype ?? 'Custom Deck' }}</p>
+                            
+                            <div class="mt-auto space-y-3">
+                                <div class="flex justify-between items-center pt-3 border-t border-zinc-800">
+                                    <div class="flex items-center gap-2 text-zinc-400">
+                                        <span class="material-symbols-outlined text-sm">analytics</span>
+                                        <span class="text-[10px] font-['Space_Grotesk'] tracking-wider">{{ deck.winRate ?? '0' }}% WR</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-zinc-400">
+                                        <span class="material-symbols-outlined text-sm">style</span>
+                                        <span class="text-[10px] font-['Space_Grotesk'] tracking-wider">{{ deck.cardCount ?? '60' }} Cards</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-2">
+                                    <button class="flex-1 bg-zinc-900 border border-zinc-800 text-zinc-300 py-2 rounded text-[10px] font-['Space_Grotesk'] uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all">
+                                        View
+                                    </button>
+                                    <button class="bg-zinc-900 border border-zinc-800 text-zinc-300 p-2 rounded hover:border-red-500/50 hover:text-red-500 transition-all">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="flex items-center justify-center min-h-[60vh]">
+                <div class="text-center max-w-md">
+                    <div class="w-24 h-24 rounded-full bg-zinc-900 border border-[#2A2A2A] flex items-center justify-center mx-auto mb-6">
+                        <span class="material-symbols-outlined text-5xl text-zinc-600">style</span>
+                    </div>
+                    <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white mb-3 uppercase tracking-tight">No Decks Yet</h2>
+                    <p class="text-zinc-400 mb-8">Start building your deck arsenal. Create your first competitive deck or import an existing decklist to get started.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button class="bg-[#FF8C00] text-black px-6 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">add</span>
+                            Create Your First Deck
+                        </button>
+                        <button class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">upload_file</span>
+                            Import Decklist
+                        </button>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-[#FF8C00] text-xl">info</span>
+                            <div class="text-left">
+                                <h3 class="font-['Space_Grotesk'] text-sm font-semibold text-white mb-1 uppercase tracking-wide">Quick Tip</h3>
+                                <p class="text-xs text-zinc-400">You can import decklists from MTGO, Arena, or any text format. We'll automatically recognize the cards and build your deck.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
