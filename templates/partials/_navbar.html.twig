@@ -22,12 +22,17 @@
         {# Right section: Search, Icons #}
         <div class="flex items-center gap-4">
             {# Quick Search Bar #}
-            <div class="hidden lg:block">
+            <div class="hidden lg:block relative" id="quickSearchContainer">
                 <input 
                     type="search" 
+                    id="quickSearch"
                     placeholder="Quick search..." 
                     class="bg-[#1A1B1E] border border-[#2A2A2A] py-2 px-4 text-xs text-zinc-300 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none w-64"
+                    autocomplete="off"
                 >
+                <div id="searchSuggestions" class="absolute top-full left-0 right-0 mt-1 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg hidden z-50 max-h-80 overflow-y-auto">
+                    <!-- Suggestions will be populated here -->
+                </div>
             </div>
 
             {# Icons Section #}

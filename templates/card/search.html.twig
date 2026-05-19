@@ -1,0 +1,414 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Card Search - ManaHoarder{% endblock %}
+
+{% block body %}
+<main class="min-h-screen">
+    <div class="max-w-[1440px] mx-auto p-8 lg:p-12">
+        <!-- Header Section -->
+        <div class="mb-10">
+            <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">Card Search</h1>
+            {% if query %}
+                <p class="text-zinc-300 text-lg">Results for: <span class="text-white font-semibold">"{{ query }}"</span></p>
+            {% else %}
+                <p class="text-zinc-300 text-lg">Search for cards using name or advanced filters</p>
+            {% endif %}
+        </div>
+
+        <!-- Search Form with Advanced Filters -->
+        <form method="get" action="{{ path('app_card_search') }}" id="searchForm">
+            <div class="mb-8 bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl overflow-hidden">
+                <!-- Basic Search -->
+                <div class="p-6 border-b border-[#2A2A2A]">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Card Name</label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">search</span>
+                        <input 
+                            type="text" 
+                            name="q"
+                            value="{{ query }}"
+                            placeholder="Search by card name..." 
+                            class="w-full bg-[#121212] border border-[#2A2A2A] py-4 pl-12 pr-3 text-base text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                        >
+                    </div>
+                </div>
+
+                <!-- Advanced Filters Toggle -->
+                <div class="px-6 py-3 bg-zinc-900/30 border-b border-[#2A2A2A]">
+                    <button type="button" id="toggleFilters" class="flex items-center gap-2 text-[#FF8C00] text-sm font-bold uppercase tracking-widest font-['Space_Grotesk'] hover:text-[#ff9d26] transition-colors">
+                        <span class="material-symbols-outlined text-base">tune</span>
+                        Advanced Filters
+                        <span class="material-symbols-outlined text-base" id="filterIcon">expand_more</span>
+                    </button>
+                </div>
+
+                <!-- Advanced Filters Panel -->
+                <div id="advancedFilters" class="hidden">
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Card Type with Multi-Select -->
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Card Type</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="typeInput"
+                                    placeholder="e.g., creature, legendary, instant" 
+                                    class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                    autocomplete="off"
+                                >
+                                <div id="typeSuggestions" class="absolute top-full left-0 right-0 mt-1 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto"></div>
+                            </div>
+                            <div id="selectedTypes" class="mt-3 flex flex-wrap gap-2">
+                                {% for type in filters.types %}
+                                    <span class="inline-flex items-center gap-2 bg-[#FF8C00] text-black px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider font-['Space_Grotesk']">
+                                        {{ type }}
+                                        <button type="button" class="hover:text-red-600 transition-colors" onclick="removeType('{{ type }}')">×</button>
+                                        <input type="hidden" name="types[]" value="{{ type }}">
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Rarity -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Rarity</label>
+                            <select name="rarity" class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded">
+                                <option value="">Any Rarity</option>
+                                <option value="common" {{ filters.rarity == 'common' ? 'selected' : '' }}>Common</option>
+                                <option value="uncommon" {{ filters.rarity == 'uncommon' ? 'selected' : '' }}>Uncommon</option>
+                                <option value="rare" {{ filters.rarity == 'rare' ? 'selected' : '' }}>Rare</option>
+                                <option value="mythic" {{ filters.rarity == 'mythic' ? 'selected' : '' }}>Mythic</option>
+                            </select>
+                        </div>
+
+                        <!-- Format Legality -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Format</label>
+                            <select name="format" class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded">
+                                <option value="">Any Format</option>
+                                <option value="standard" {{ filters.format == 'standard' ? 'selected' : '' }}>Standard</option>
+                                <option value="modern" {{ filters.format == 'modern' ? 'selected' : '' }}>Modern</option>
+                                <option value="commander" {{ filters.format == 'commander' ? 'selected' : '' }}>Commander</option>
+                                <option value="legacy" {{ filters.format == 'legacy' ? 'selected' : '' }}>Legacy</option>
+                                <option value="vintage" {{ filters.format == 'vintage' ? 'selected' : '' }}>Vintage</option>
+                                <option value="pioneer" {{ filters.format == 'pioneer' ? 'selected' : '' }}>Pioneer</option>
+                                <option value="pauper" {{ filters.format == 'pauper' ? 'selected' : '' }}>Pauper</option>
+                            </select>
+                        </div>
+
+                        <!-- Mana Cost -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Mana Cost (CMC)</label>
+                            <input 
+                                type="text" 
+                                name="cmc"
+                                value="{{ filters.cmc }}"
+                                placeholder="e.g., =3, <=2, >=4" 
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                            >
+                            <p class="mt-1 text-xs text-zinc-500">Use =, <=, >= operators</p>
+                        </div>
+
+                        <!-- Artist with Autocomplete -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Artist</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="artist"
+                                    id="artistInput"
+                                    value="{{ filters.artist }}"
+                                    placeholder="Artist name" 
+                                    class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                    autocomplete="off"
+                                >
+                                <div id="artistSuggestions" class="absolute top-full left-0 right-0 mt-1 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto"></div>
+                            </div>
+                        </div>
+
+                        <!-- Set/Expansion with Autocomplete -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Set Code</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="set"
+                                    id="setInput"
+                                    value="{{ filters.set }}"
+                                    placeholder="e.g., mkm, lci, woe" 
+                                    class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                    autocomplete="off"
+                                >
+                                <div id="setSuggestions" class="absolute top-full left-0 right-0 mt-1 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto"></div>
+                            </div>
+                        </div>
+
+                        <!-- Color Identity -->
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Colors</label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-white/50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="colors[]" value="W" {{ 'W' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
+                                    <div class="w-5 h-5 rounded-full bg-yellow-50 border border-white/20"></div>
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">White</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-blue-500/50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="colors[]" value="U" {{ 'U' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
+                                    <div class="w-5 h-5 rounded-full bg-blue-600 border border-white/20"></div>
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Blue</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-purple-500/50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="colors[]" value="B" {{ 'B' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
+                                    <div class="w-5 h-5 rounded-full bg-purple-900 border border-white/20"></div>
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Black</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-red-500/50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="colors[]" value="R" {{ 'R' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
+                                    <div class="w-5 h-5 rounded-full bg-red-600 border border-white/20"></div>
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Red</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-green-500/50 transition-all cursor-pointer">
+                                    <input type="checkbox" name="colors[]" value="G" {{ 'G' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
+                                    <div class="w-5 h-5 rounded-full bg-green-600 border border-white/20"></div>
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Green</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Filter Actions -->
+                    <div class="px-6 pb-6 flex gap-3">
+                        <button type="submit" class="bg-[#FF8C00] text-black px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base">search</span>
+                            Apply Filters
+                        </button>
+                        <button type="button" onclick="window.location.href='{{ path('app_card_search') }}'" class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {% if cards|length > 0 %}
+            <!-- Results Count -->
+            <div class="mb-6">
+                <p class="text-zinc-300 text-base font-['Space_Grotesk']">
+                    Found <span class="text-[#FF8C00] font-bold text-lg">{{ cards|length }}</span> cards
+                </p>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for card in cards %}
+                    <a href="{{ path('app_card_view', {id: card.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded overflow-hidden group">
+                        <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900">
+                            {% if card.image %}
+                                <img alt="{{ card.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="{{ card.image }}"/>
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-6xl text-zinc-700">style</span>
+                                </div>
+                            {% endif %}
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-['Space_Grotesk'] text-zinc-200 border border-zinc-700 uppercase font-bold">
+                                {{ card.rarity }}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-['Space_Grotesk'] text-sm font-semibold text-white mb-1 line-clamp-2">{{ card.name }}</h3>
+                            <p class="text-xs text-zinc-400 font-['Space_Grotesk'] uppercase tracking-wider">{{ card.set }}</p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+        {% elseif query or filters.types|length > 0 or filters.rarity or filters.format %}
+            <!-- No Results -->
+            <div class="flex items-center justify-center min-h-[40vh]">
+                <div class="text-center max-w-md">
+                    <div class="w-24 h-24 rounded-full bg-zinc-900 border border-[#2A2A2A] flex items-center justify-center mx-auto mb-6">
+                        <span class="material-symbols-outlined text-5xl text-zinc-600">search_off</span>
+                    </div>
+                    <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white mb-3 uppercase tracking-tight">No Cards Found</h2>
+                    <p class="text-zinc-300 text-base mb-8">We couldn't find any cards matching your search criteria. Try adjusting your filters.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</main>
+
+<script>
+    // Toggle advanced filters
+    const toggleBtn = document.getElementById('toggleFilters');
+    const filtersPanel = document.getElementById('advancedFilters');
+    const filterIcon = document.getElementById('filterIcon');
+
+    toggleBtn.addEventListener('click', function() {
+        filtersPanel.classList.toggle('hidden');
+        filterIcon.textContent = filtersPanel.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+    });
+
+    // Auto-expand if filters are active
+    {% if filters.types|length > 0 or filters.rarity or filters.format or filters.cmc or filters.artist or filters.set or filters.colors|length > 0 %}
+        filtersPanel.classList.remove('hidden');
+        filterIcon.textContent = 'expand_less';
+    {% endif %}
+
+    // Card Type Multi-Select
+    const typeInput = document.getElementById('typeInput');
+    const typeSuggestions = document.getElementById('typeSuggestions');
+    const selectedTypesContainer = document.getElementById('selectedTypes');
+    let selectedTypes = {{ filters.types|json_encode|raw }};
+    let typeDebounceTimer;
+
+    typeInput.addEventListener('input', function(e) {
+        clearTimeout(typeDebounceTimer);
+        const query = e.target.value.trim();
+
+        if (query.length < 1) {
+            typeSuggestions.classList.add('hidden');
+            return;
+        }
+
+        typeDebounceTimer = setTimeout(() => {
+            fetch(`{{ path('app_card_autocomplete_types') }}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(suggestions => {
+                    if (suggestions.length === 0) {
+                        typeSuggestions.classList.add('hidden');
+                        return;
+                    }
+
+                    typeSuggestions.innerHTML = suggestions.map(type => `
+                        <button type="button" onclick="addType('${type}')" class="block w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors border-b border-zinc-800 last:border-b-0">
+                            <span class="font-['Space_Grotesk']">${type}</span>
+                        </button>
+                    `).join('');
+                    
+                    typeSuggestions.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Type autocomplete error:', error);
+                    typeSuggestions.classList.add('hidden');
+                });
+        }, 300);
+    });
+
+    function addType(type) {
+        if (selectedTypes.includes(type)) {
+            return;
+        }
+        
+        selectedTypes.push(type);
+        
+        const bubble = document.createElement('span');
+        bubble.className = 'inline-flex items-center gap-2 bg-[#FF8C00] text-black px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider font-[\'Space_Grotesk\']';
+        bubble.innerHTML = `
+            ${type}
+            <button type="button" class="hover:text-red-600 transition-colors" onclick="removeType('${type}')">×</button>
+            <input type="hidden" name="types[]" value="${type}">
+        `;
+        
+        selectedTypesContainer.appendChild(bubble);
+        typeInput.value = '';
+        typeSuggestions.classList.add('hidden');
+    }
+
+    function removeType(type) {
+        selectedTypes = selectedTypes.filter(t => t !== type);
+        const bubbles = selectedTypesContainer.querySelectorAll('span');
+        bubbles.forEach(bubble => {
+            if (bubble.textContent.trim().startsWith(type)) {
+                bubble.remove();
+            }
+        });
+    }
+
+    // Artist Autocomplete
+    const artistInput = document.getElementById('artistInput');
+    const artistSuggestions = document.getElementById('artistSuggestions');
+    let artistDebounceTimer;
+
+    artistInput.addEventListener('input', function(e) {
+        clearTimeout(artistDebounceTimer);
+        const query = e.target.value.trim();
+
+        if (query.length < 2) {
+            artistSuggestions.classList.add('hidden');
+            return;
+        }
+
+        artistDebounceTimer = setTimeout(() => {
+            fetch(`{{ path('app_card_autocomplete_artists') }}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(suggestions => {
+                    if (suggestions.length === 0) {
+                        artistSuggestions.classList.add('hidden');
+                        return;
+                    }
+
+                    artistSuggestions.innerHTML = suggestions.map(artist => `
+                        <button type="button" onclick="document.getElementById('artistInput').value='${artist}'; document.getElementById('artistSuggestions').classList.add('hidden');" class="block w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors border-b border-zinc-800 last:border-b-0">
+                            <span class="font-['Space_Grotesk']">${artist}</span>
+                        </button>
+                    `).join('');
+                    
+                    artistSuggestions.classList.remove('hidden');
+                })
+                .catch(error => console.error('Artist autocomplete error:', error));
+        }, 300);
+    });
+
+    // Set Autocomplete
+    const setInput = document.getElementById('setInput');
+    const setSuggestions = document.getElementById('setSuggestions');
+    let setDebounceTimer;
+
+    setInput.addEventListener('input', function(e) {
+        clearTimeout(setDebounceTimer);
+        const query = e.target.value.trim();
+
+        if (query.length < 1) {
+            setSuggestions.classList.add('hidden');
+            return;
+        }
+
+        setDebounceTimer = setTimeout(() => {
+            fetch(`{{ path('app_card_autocomplete_sets') }}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(suggestions => {
+                    if (suggestions.length === 0) {
+                        setSuggestions.classList.add('hidden');
+                        return;
+                    }
+
+                    setSuggestions.innerHTML = suggestions.map(set => `
+                        <button type="button" onclick="document.getElementById('setInput').value='${set.code}'; document.getElementById('setSuggestions').classList.add('hidden');" class="block w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors border-b border-zinc-800 last:border-b-0">
+                            <div class="font-['Space_Grotesk']">
+                                <span class="text-[#FF8C00] font-bold">${set.code}</span> - ${set.name}
+                            </div>
+                        </button>
+                    `).join('');
+                    
+                    setSuggestions.classList.remove('hidden');
+                })
+                .catch(error => console.error('Set autocomplete error:', error));
+        }, 300);
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!typeInput.contains(e.target) && !typeSuggestions.contains(e.target)) {
+            typeSuggestions.classList.add('hidden');
+        }
+        if (!artistInput.contains(e.target) && !artistSuggestions.contains(e.target)) {
+            artistSuggestions.classList.add('hidden');
+        }
+        if (!setInput.contains(e.target) && !setSuggestions.contains(e.target)) {
+            setSuggestions.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

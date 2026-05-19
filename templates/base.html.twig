@@ -30,5 +30,65 @@
         <div class="pt-16">
             {% block body %}{% endblock %}
         </div>
+
+        <script>
+            // Quick Search Autocomplete
+            const searchInput = document.getElementById('quickSearch');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            let debounceTimer;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    clearTimeout(debounceTimer);
+                    const query = e.target.value.trim();
+
+                    if (query.length < 2) {
+                        suggestionsContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetch(`{{ path('app_card_autocomplete') }}?q=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(suggestions => {
+                                if (suggestions.length === 0) {
+                                    suggestionsContainer.classList.add('hidden');
+                                    return;
+                                }
+
+                                suggestionsContainer.innerHTML = suggestions.map(name => `
+                                    <a href="{{ path('app_card_search') }}?q=${encodeURIComponent(name)}" 
+                                       class="block px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors border-b border-zinc-800 last:border-b-0">
+                                        <span class="font-['Space_Grotesk']">${name}</span>
+                                    </a>
+                                `).join('');
+                                
+                                suggestionsContainer.classList.remove('hidden');
+                            })
+                            .catch(error => {
+                                console.error('Search error:', error);
+                                suggestionsContainer.classList.add('hidden');
+                            });
+                    }, 300);
+                });
+
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = e.target.value.trim();
+                        if (query.length >= 2) {
+                            window.location.href = `{{ path('app_card_search') }}?q=${encodeURIComponent(query)}`;
+                        }
+                    }
+                });
+
+                // Close suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!document.getElementById('quickSearchContainer').contains(e.target)) {
+                        suggestionsContainer.classList.add('hidden');
+                    }
+                });
+            }
+        </script>
     </body>
 </html>

@@ -143,8 +143,195 @@ class ScryfallService
     }
 
     /**
-     * Método privado para cachear una carta desde los datos de Scryfall
+     * Autocomplete for card types
      */
+    public function autocompleteTypes(string $query): array
+    {
+        if (strlen($query) < 1) {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/card-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            $types = $data['data'] ?? [];
+            
+            // Filter types that match the query
+            $filtered = array_filter($types, function($type) use ($query) {
+                return stripos($type, $query) !== false;
+            });
+            
+            return array_slice(array_values($filtered), 0, 10);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Autocomplete for artists
+     */
+    public function autocompleteArtists(string $query): array
+    {
+        if (strlen($query) < 2) {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/artist-names', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            $artists = $data['data'] ?? [];
+            
+            // Filter artists that match the query
+            $filtered = array_filter($artists, function($artist) use ($query) {
+                return stripos($artist, $query) !== false;
+            });
+            
+            return array_slice(array_values($filtered), 0, 10);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get all set codes and names
+     */
+    public function autocompleteSets(string $query): array
+    {
+        if (strlen($query) < 1) {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/sets', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            $sets = $data['data'] ?? [];
+            
+            // Filter sets that match the query (by code or name)
+            $filtered = array_filter($sets, function($set) use ($query) {
+                return stripos($set['code'], $query) !== false || 
+                       stripos($set['name'], $query) !== false;
+            });
+            
+            // Map to simpler format
+            $results = array_map(function($set) {
+                return [
+                    'code' => $set['code'],
+                    'name' => $set['name'],
+                ];
+            }, $filtered);
+            
+            return array_slice(array_values($results), 0, 10);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+    public function autocompleteCardNames(string $query): array
+    {
+        if (strlen($query) < 2) {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/cards/autocomplete', [
+                'query' => ['q' => $query],
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            return array_slice($data['data'] ?? [], 0, 5);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Search cards by name - returns multiple results
+     */
+    public function searchCards(string $query): array
+    {
+        if (strlen($query) < 2) {
+            return [];
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/cards/search', [
+                'query' => ['q' => $query, 'order' => 'name'],
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            return $data['data'] ?? [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Search card by ID from Scryfall
+     */
+    public function searchCardById(string $id): ?array
+    {
+        try {
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/cards/' . $id, [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return null;
+            }
+
+            return $response->toArray();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
     private function cacheCard(array $cardData): ScryfallCard
     {
         // Verificar si ya existe por Scryfall ID (para evitar duplicados)
