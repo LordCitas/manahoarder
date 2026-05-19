@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registro - ManaHoarder{% endblock %}
+{% block title %}Register - ManaHoarder{% endblock %}
 
 {% block body %}
 <main class="min-h-screen overflow-y-auto">
@@ -8,74 +8,74 @@
         <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <section class="border border-[#2A2A2A] bg-[#121212] p-6">
-                <h1 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk'] text-[#FF8C00]">Crear cuenta</h1>
-                <p class="mt-2 text-zinc-500 text-sm">Crea una cuenta para guardar tus listas y usar el deck builder.</p>
+                <h1 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk'] text-[#FF8C00]">Create Account</h1>
+                <p class="mt-2 text-zinc-500 text-sm">Create an account to save your lists and use the deck builder.</p>
 
                 {% if registrationForm.vars.errors|length > 0 %}
                     <div class="mt-4 border border-red-900/60 bg-red-900/20 px-4 py-3 text-sm text-red-100">
-                        Revisa el formulario: hay errores.
+                        Please review the form: there are errors.
                     </div>
                 {% endif %}
 
                 {{ form_start(registrationForm, { attr: { class: 'mt-6 space-y-4' } }) }}
                     <div>
                         {{ form_label(registrationForm.email, 'Email', { label_attr: { class: "block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1" } }) }}
-                        {{ form_widget(registrationForm.email, { attr: { placeholder: 'tu@email.com', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" } }) }}
+                        {{ form_widget(registrationForm.email, { attr: { placeholder: 'your@email.com', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" } }) }}
                         <div class="mt-1 text-xs text-red-200">{{ form_errors(registrationForm.email) }}</div>
                     </div>
 
                     <div>
-                        {{ form_label(registrationForm.plainPassword, 'Contraseña', { label_attr: { class: "block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1" } }) }}
-                        {{ form_widget(registrationForm.plainPassword, { attr: { placeholder: 'mínimo 6 caracteres', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" } }) }}
+                        {{ form_label(registrationForm.plainPassword, 'Password', { label_attr: { class: "block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1" } }) }}
+                        {{ form_widget(registrationForm.plainPassword, { attr: { placeholder: 'minimum 6 characters', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" } }) }}
                         <div class="mt-1 text-xs text-red-200">{{ form_errors(registrationForm.plainPassword) }}</div>
-                        <p class="mt-2 text-xs text-zinc-500">Consejo: usa una contraseña única para este sitio.</p>
+                        <p class="mt-2 text-xs text-zinc-500">Tip: use a unique password for this site.</p>
                     </div>
 
                     <label class="flex items-start gap-3 border border-[#2A2A2A] bg-zinc-900/30 p-3">
                         {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'mt-1' } }) }}
                         <span class="text-xs text-zinc-400">
-                            Acepto los términos básicos de uso (MVP).
-                            <span class="block text-[11px] text-zinc-500">(Esto es un placeholder legal por ahora.)</span>
+                            I agree to the basic terms of use (MVP).
+                            <span class="block text-[11px] text-zinc-500">(This is a legal placeholder for now.)</span>
                         </span>
                     </label>
                     <div class="text-xs text-red-200">{{ form_errors(registrationForm.agreeTerms) }}</div>
 
                     <button type="submit" class="w-full bg-[#FF8C00] text-black py-3 text-[10px] font-black uppercase tracking-widest rounded hover:bg-[#ff9d26] transition-colors">
-                        Crear cuenta
+                        Create Account
                     </button>
 
                     <p class="text-xs text-zinc-500">
-                        ¿Ya tienes cuenta?
-                        <a class="text-[#FF8C00] font-bold hover:underline" href="{{ path('app_login') }}">Inicia sesión</a>.
+                        Already have an account?
+                        <a class="text-[#FF8C00] font-bold hover:underline" href="{{ path('app_login') }}">Sign in</a>.
                     </p>
                 {{ form_end(registrationForm) }}
             </section>
 
             <section class="border border-[#2A2A2A] bg-[#1A1B1E]/50 p-6">
-                <h2 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk']">¿Ya tienes cuenta?</h2>
-                <p class="mt-2 text-zinc-500 text-sm">Puedes entrar directamente y empezar a crear listas.</p>
+                <h2 class="text-xl font-bold uppercase tracking-widest font-['Space_Grotesk']">Already have an account?</h2>
+                <p class="mt-2 text-zinc-500 text-sm">You can log in directly and start creating lists.</p>
 
                 <div class="mt-6 space-y-3">
                     <div class="border border-[#2A2A2A] bg-[#121212] p-4">
                         <div class="flex items-start gap-3">
                             <span class="material-symbols-outlined text-[#FF8C00]">login</span>
                             <div>
-                                <div class="text-xs font-bold uppercase tracking-widest text-zinc-200 font-['Space_Grotesk']">Acceso rápido</div>
-                                <div class="mt-1 text-sm text-zinc-500">Email + contraseña. Tus listas quedan ligadas a tu usuario.</div>
+                                <div class="text-xs font-bold uppercase tracking-widest text-zinc-200 font-['Space_Grotesk']">Quick Access</div>
+                                <div class="mt-1 text-sm text-zinc-500">Email + password. Your lists are linked to your user.</div>
                             </div>
                         </div>
                     </div>
 
                     <a class="block text-center bg-[#FF8C00] text-black px-4 py-3 text-[10px] font-black uppercase tracking-widest rounded hover:bg-[#ff9d26] transition-colors" href="{{ path('app_login') }}">
-                        Ir a login
+                        Go to Login
                     </a>
 
                     <a class="block text-center border border-[#2A2A2A] px-4 py-3 text-[10px] font-black uppercase tracking-widest text-zinc-300 hover:bg-zinc-800 transition-colors rounded" href="{{ path('app_home') }}">
-                        Volver al inicio
+                        Back to Home
                     </a>
 
                     <p class="text-[11px] text-zinc-500">
-                        Más adelante podremos añadir OAuth (Google/Discord) si te interesa.
+                        We can add OAuth (Google/Discord) later if you're interested.
                     </p>
                 </div>
             </section>
