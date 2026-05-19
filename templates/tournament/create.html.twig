@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Tournament - ManaHoarder{% endblock %}
+
+{% block body %}
+<main class="min-h-screen">
+    <div class="max-w-[1440px] mx-auto p-8 lg:p-12">
+        
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{{ path('app_tournaments') }}" class="inline-flex items-center gap-2 text-zinc-300 hover:text-[#FF8C00] transition-colors text-sm font-['Space_Grotesk'] uppercase tracking-wider">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Back to Tournaments
+            </a>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+            <div class="mb-8">
+                <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">Create Tournament</h1>
+                <p class="text-zinc-300 text-lg">Set up a new competitive event for players to join.</p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                <!-- Tournament Details -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-6">Tournament Details</h2>
+                    
+                    <div class="space-y-5">
+                        <!-- Tournament Name -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Tournament Name</label>
+                            <input 
+                                type="text" 
+                                name="name"
+                                placeholder="e.g., Friday Night Magic, Weekly Commander" 
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                required
+                                maxlength="255"
+                            >
+                        </div>
+
+                        <!-- Format -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Format</label>
+                            <select name="format" class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded" required>
+                                <option value="">Select Format</option>
+                                <option value="Standard">Standard</option>
+                                <option value="Modern">Modern</option>
+                                <option value="Commander">Commander</option>
+                                <option value="Legacy">Legacy</option>
+                                <option value="Vintage">Vintage</option>
+                                <option value="Pioneer">Pioneer</option>
+                                <option value="Pauper">Pauper</option>
+                                <option value="Draft">Draft</option>
+                                <option value="Sealed">Sealed</option>
+                                <option value="Limited">Limited</option>
+                            </select>
+                        </div>
+
+                        <!-- Max Participants -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Max Participants</label>
+                            <input 
+                                type="number" 
+                                name="maxPlayers"
+                                placeholder="e.g., 8, 16, 32" 
+                                min="2"
+                                max="128"
+                                value="16"
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                required
+                            >
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Description (Optional)</label>
+                            <textarea 
+                                name="description"
+                                rows="5"
+                                placeholder="Add tournament rules, prize info, or other details..." 
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded resize-none"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Box & Actions -->
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="flex-1 bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-[#FF8C00] text-lg">info</span>
+                            <div>
+                                <h3 class="font-['Space_Grotesk'] text-xs font-semibold text-white mb-1 uppercase tracking-wide">Tournament Code</h3>
+                                <p class="text-xs text-zinc-400">You'll receive a unique 8-character code to share with players.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <button type="submit" class="flex-1 md:flex-none bg-[#FF8C00] text-black px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">add</span>
+                            Create
+                        </button>
+                        <a href="{{ path('app_tournaments') }}" class="flex-1 md:flex-none bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all text-center">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

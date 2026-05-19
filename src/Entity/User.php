@@ -47,10 +47,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Album::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $albums;
 
+    /**
+     * @var Collection<int, Decklist>
+     */
+    #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $decklists;
+
+    /**
+     * @var Collection<int, TournamentParticipant>
+     */
+    #[ORM\OneToMany(targetEntity: TournamentParticipant::class, mappedBy: 'user')]
+    private Collection $tournamentParticipants;
+
+    /**
+     * @var Collection<int, Tournament>
+     */
+    #[ORM\OneToMany(targetEntity: Tournament::class, mappedBy: 'creator', orphanRemoval: true)]
+    private Collection $tournaments;
+
     public function __construct()
     {
         $this->userCards = new ArrayCollection();
         $this->albums = new ArrayCollection();
+        $this->decklists = new ArrayCollection();
+        $this->tournamentParticipants = new ArrayCollection();
+        $this->tournaments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,6 +203,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($album->getUser() === $this) {
                 $album->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Decklist>
+     */
+    public function getDecklists(): Collection
+    {
+        return $this->decklists;
+    }
+
+    public function addDecklist(Decklist $decklist): static
+    {
+        if (!$this->decklists->contains($decklist)) {
+            $this->decklists->add($decklist);
+            $decklist->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecklist(Decklist $decklist): static
+    {
+        if ($this->decklists->removeElement($decklist)) {
+            // set the owning side to null (unless already changed)
+            if ($decklist->getUser() === $this) {
+                $decklist->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TournamentParticipant>
+     */
+    public function getTournamentParticipants(): Collection
+    {
+        return $this->tournamentParticipants;
+    }
+
+    public function addTournamentParticipant(TournamentParticipant $tournamentParticipant): static
+    {
+        if (!$this->tournamentParticipants->contains($tournamentParticipant)) {
+            $this->tournamentParticipants->add($tournamentParticipant);
+            $tournamentParticipant->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTournamentParticipant(TournamentParticipant $tournamentParticipant): static
+    {
+        if ($this->tournamentParticipants->removeElement($tournamentParticipant)) {
+            // set the owning side to null (unless already changed)
+            if ($tournamentParticipant->getUser() === $this) {
+                $tournamentParticipant->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tournament>
+     */
+    public function getTournaments(): Collection
+    {
+        return $this->tournaments;
+    }
+
+    public function addTournament(Tournament $tournament): static
+    {
+        if (!$this->tournaments->contains($tournament)) {
+            $this->tournaments->add($tournament);
+            $tournament->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTournament(Tournament $tournament): static
+    {
+        if ($this->tournaments->removeElement($tournament)) {
+            // set the owning side to null (unless already changed)
+            if ($tournament->getCreator() === $this) {
+                $tournament->setCreator(null);
             }
         }
 
