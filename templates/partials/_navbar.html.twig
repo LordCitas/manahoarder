@@ -59,7 +59,16 @@
                         </button>
                         <div class="absolute right-0 top-full mt-2 w-48 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                             <div class="p-3 border-b border-[#2A2A2A]">
-                                <div class="text-xs text-white font-semibold">{{ app.user.email }}</div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    {% if app.user.profileArtUrl %}
+                                        <img src="{{ app.user.profileArtUrl }}" alt="{{ app.user.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A]">
+                                    {% elseif app.user.profilePictureFilename %}
+                                        <img src="/uploads/profile-pictures/{{ app.user.profilePictureFilename }}" alt="{{ app.user.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A] object-cover">
+                                    {% else %}
+                                        <div class="w-5 h-5 rounded bg-[#FF8C00]/20 border border-[#FF8C00] flex items-center justify-center text-[#FF8C00] text-xs font-bold">{{ app.user.nickname|slice(0, 1)|upper }}</div>
+                                    {% endif %}
+                                    <div class="text-xs text-white font-semibold">{{ app.user.nickname }}</div>
+                                </div>
                                 <div class="text-[10px] text-zinc-500 font-['Space_Grotesk'] uppercase">User Account</div>
                             </div>
                             <a href="{{ path('app_settings') }}" class="block px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2">

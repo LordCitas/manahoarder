@@ -12,7 +12,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NICKNAME', fields: ['nickname'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['nickname'], message: 'This nickname is already taken')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,6 +24,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $nickname = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $profilePictureFilename = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $profileArtUrl = null;
 
     /**
      * @var list<string> The user roles
@@ -91,6 +102,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getNickname(): ?string
+    {
+        return $this->nickname;
+    }
+
+    public function setNickname(string $nickname): static
+    {
+        $this->nickname = $nickname;
+
+        return $this;
+    }
+
+    public function getProfilePictureFilename(): ?string
+    {
+        return $this->profilePictureFilename;
+    }
+
+    public function setProfilePictureFilename(?string $profilePictureFilename): static
+    {
+        $this->profilePictureFilename = $profilePictureFilename;
+
+        return $this;
+    }
+
+    public function getProfileArtUrl(): ?string
+    {
+        return $this->profileArtUrl;
+    }
+
+    public function setProfileArtUrl(?string $profileArtUrl): static
+    {
+        $this->profileArtUrl = $profileArtUrl;
+
+        return $this;
+    }
+
     /**
      * A visual identifier that represents this user.
      *
@@ -98,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->nickname;
     }
 
     /**

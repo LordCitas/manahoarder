@@ -93,7 +93,16 @@
                                 <div class="space-y-2 mb-4">
                                     <div class="flex items-center gap-2 text-sm text-zinc-400">
                                         <span class="material-symbols-outlined text-base">person</span>
-                                        <span class="font-['Space_Grotesk']">Host: {{ tournament.creator.email }}</span>
+                                        <div class="flex items-center gap-2">
+                                            {% if tournament.creator.profileArtUrl %}
+                                                <img src="{{ tournament.creator.profileArtUrl }}" alt="{{ tournament.creator.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A]">
+                                            {% elseif tournament.creator.profilePictureFilename %}
+                                                <img src="/uploads/profile-pictures/{{ tournament.creator.profilePictureFilename }}" alt="{{ tournament.creator.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A] object-cover">
+                                            {% else %}
+                                                <div class="w-5 h-5 rounded bg-[#FF8C00]/20 border border-[#FF8C00] flex items-center justify-center text-[#FF8C00] text-xs font-bold">{{ tournament.creator.nickname|slice(0, 1)|upper }}</div>
+                                            {% endif %}
+                                            <span class="font-['Space_Grotesk']">Host: {{ tournament.creator.nickname }}</span>
+                                        </div>
                                     </div>
                                     <div class="flex items-center gap-2 text-sm text-zinc-400">
                                         <span class="material-symbols-outlined text-base">group</span>

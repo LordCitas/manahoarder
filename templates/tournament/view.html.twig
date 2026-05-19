@@ -60,7 +60,16 @@
                     <div class="space-y-4">
                         <div>
                             <p class="text-xs text-zinc-500 font-['Space_Grotesk'] uppercase tracking-wider mb-1">Organizer</p>
-                            <p class="text-sm text-zinc-200 font-['Space_Grotesk']">{{ tournament.creator.email }}</p>
+                            <div class="flex items-center gap-3">
+                                {% if tournament.creator.profileArtUrl %}
+                                    <img src="{{ tournament.creator.profileArtUrl }}" alt="{{ tournament.creator.nickname }}" class="w-8 h-8 rounded border border-[#2A2A2A]">
+                                {% elseif tournament.creator.profilePictureFilename %}
+                                    <img src="/uploads/profile-pictures/{{ tournament.creator.profilePictureFilename }}" alt="{{ tournament.creator.nickname }}" class="w-8 h-8 rounded border border-[#2A2A2A] object-cover">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded bg-[#FF8C00]/20 border border-[#FF8C00] flex items-center justify-center text-[#FF8C00] text-xs font-bold">{{ tournament.creator.nickname|slice(0, 1)|upper }}</div>
+                                {% endif %}
+                                <p class="text-sm text-zinc-200 font-['Space_Grotesk']">{{ tournament.creator.nickname }}</p>
+                            </div>
                         </div>
                         
                         <div>
@@ -109,7 +118,18 @@
                                     {% for participant in participants %}
                                         <tr class="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
                                             <td class="py-3 px-2 text-[#FF8C00] font-bold">{{ loop.index }}</td>
-                                            <td class="py-3 px-2 text-zinc-200">{{ participant.user.email }}</td>
+                                            <td class="py-3 px-2">
+                                                <div class="flex items-center gap-2">
+                                                    {% if participant.user.profileArtUrl %}
+                                                        <img src="{{ participant.user.profileArtUrl }}" alt="{{ participant.user.nickname }}" class="w-6 h-6 rounded border border-[#2A2A2A]">
+                                                    {% elseif participant.user.profilePictureFilename %}
+                                                        <img src="/uploads/profile-pictures/{{ participant.user.profilePictureFilename }}" alt="{{ participant.user.nickname }}" class="w-6 h-6 rounded border border-[#2A2A2A] object-cover">
+                                                    {% else %}
+                                                        <div class="w-6 h-6 rounded bg-[#FF8C00]/20 border border-[#FF8C00] flex items-center justify-center text-[#FF8C00] text-xs font-bold">{{ participant.user.nickname|slice(0, 1)|upper }}</div>
+                                                    {% endif %}
+                                                    <span class="text-zinc-200">{{ participant.user.nickname }}</span>
+                                                </div>
+                                            </td>
                                             <td class="py-3 px-2 text-zinc-400">
                                                 {% if participant.decklist %}
                                                     {{ participant.decklist.name }}

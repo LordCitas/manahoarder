@@ -25,6 +25,13 @@
                     </div>
 
                     <div>
+                        {{ form_label(registrationForm.nickname, 'Nickname', { label_attr: { class: "block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1" } }) }}
+                        {{ form_widget(registrationForm.nickname, { attr: { placeholder: 'your display name', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] focus:border-[#FF8C00] outline-none" } }) }}
+                        <div class="mt-1 text-xs text-red-200">{{ form_errors(registrationForm.nickname) }}</div>
+                        <p class="mt-2 text-xs text-zinc-500">This is how other players will see you in tournaments (3-255 characters).</p>
+                    </div>
+
+                    <div>
                         {{ form_label(registrationForm.plainPassword, 'Password', { label_attr: { class: "block text-[10px] font-bold uppercase tracking-widest text-zinc-500 font-['Space_Grotesk'] mb-1" } }) }}
                         {{ form_widget(registrationForm.plainPassword, { attr: { placeholder: 'minimum 6 characters', class: "w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-xs font-['Space_Grotesk'] tracking-widest uppercase focus:border-[#FF8C00] outline-none" } }) }}
                         <div class="mt-1 text-xs text-red-200">{{ form_errors(registrationForm.plainPassword) }}</div>

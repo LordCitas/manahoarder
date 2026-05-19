@@ -6,6 +6,7 @@ use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
@@ -18,6 +19,19 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email')
+            ->add('nickname', TextType::class, [
+                'constraints' => [
+                    new NotBlank(
+                        message: 'Please enter a nickname',
+                    ),
+                    new Length(
+                        min: 3,
+                        max: 255,
+                        minMessage: 'Your nickname should be at least {{ limit }} characters',
+                        maxMessage: 'Your nickname should not exceed {{ limit }} characters',
+                    ),
+                ],
+            ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
