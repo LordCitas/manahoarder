@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -32,6 +34,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, UserCard>
+     */
+    #[ORM\OneToMany(targetEntity: UserCard::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $userCards;
+
+    /**
+     * @var Collection<int, Album>
+     */
+    #[ORM\OneToMany(targetEntity: Album::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $albums;
+
+    public function __construct()
+    {
+        $this->userCards = new ArrayCollection();
+        $this->albums = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,5 +126,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
 
         return $data;
+    }
+
+    /**
+     * @return Collection<int, UserCard>
+     */
+    public function getUserCards(): Collection
+    {
+        return $this->userCards;
+    }
+
+    public function addUserCard(UserCard $userCard): static
+    {
+        if (!$this->userCards->contains($userCard)) {
+            $this->userCards->add($userCard);
+            $userCard->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserCard(UserCard $userCard): static
+    {
+        if ($this->userCards->removeElement($userCard)) {
+            // set the owning side to null (unless already changed)
+            if ($userCard->getUser() === $this) {
+                $userCard->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Album>
+     */
+    public function getAlbums(): Collection
+    {
+        return $this->albums;
+    }
+
+    public function addAlbum(Album $album): static
+    {
+        if (!$this->albums->contains($album)) {
+            $this->albums->add($album);
+            $album->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlbum(Album $album): static
+    {
+        if ($this->albums->removeElement($album)) {
+            // set the owning side to null (unless already changed)
+            if ($album->getUser() === $this) {
+                $album->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
