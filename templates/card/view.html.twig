@@ -19,22 +19,26 @@
             <!-- Left Column: Card Image(s), Prices, and Actions -->
             <div class="space-y-4">
                 {% if card.images|length > 0 %}
-                    {% for image in card.images %}
-                        <div class="bg-[#1A1B1E] border border-[#2A2A2A] rounded-xl overflow-hidden">
-                            {% if image.large %}
-                                <img src="{{ image.large }}" alt="{{ image.name ?? card.name }}" class="w-full h-auto">
-                            {% else %}
-                                <div class="aspect-[5/7] flex items-center justify-center bg-zinc-900">
-                                    <span class="material-symbols-outlined text-8xl text-zinc-700">style</span>
-                                </div>
-                            {% endif %}
-                            {% if image.name is defined and image.name %}
-                                <div class="p-3 bg-zinc-900/50 border-t border-[#2A2A2A]">
-                                    <p class="text-sm font-['Space_Grotesk'] text-zinc-300 font-semibold">{{ image.name }}</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+                    <div class="bg-[#1A1B1E] border border-[#2A2A2A] rounded-xl overflow-hidden relative" id="cardImageContainer">
+                        {% if card.images|length > 1 %}
+                            <!-- Flip button for double-faced cards -->
+                            <button onclick="flipCard()" class="absolute top-3 right-3 z-10 bg-black/70 hover:bg-[#FF8C00] text-white hover:text-black p-2 rounded-lg transition-all backdrop-blur-sm border border-white/20 hover:border-[#FF8C00]" title="Flip card">
+                                <span class="material-symbols-outlined text-xl">sync</span>
+                            </button>
+                        {% endif %}
+                        
+                        {% for image in card.images %}
+                            <div class="card-face {{ loop.index0 > 0 ? 'hidden' : '' }}" data-face-index="{{ loop.index0 }}">
+                                {% if image.large %}
+                                    <img src="{{ image.large }}" alt="{{ image.name ?? card.name }}" class="w-full h-auto">
+                                {% else %}
+                                    <div class="aspect-[5/7] flex items-center justify-center bg-zinc-900">
+                                        <span class="material-symbols-outlined text-8xl text-zinc-700">style</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
 
                 <!-- Prices -->
@@ -87,50 +91,46 @@
             <div class="lg:col-span-2 space-y-3">
                 
                 <!-- Card Name and Mana Cost -->
-                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl">
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl" id="cardHeader">
                     <div class="flex items-start justify-between gap-4 mb-3">
-                        <h1 class="font-['Space_Grotesk'] text-2xl font-bold text-white">{{ card.name }}</h1>
-                        {% if card.mana_cost %}
-                            <div class="text-lg text-zinc-300 font-['Space_Grotesk'] whitespace-nowrap">{{ card.mana_cost }}</div>
-                        {% endif %}
+                        <h1 class="font-['Space_Grotesk'] text-2xl font-bold text-white" id="cardName">{{ card.name }}</h1>
+                        <div class="text-lg text-zinc-300 font-['Space_Grotesk'] whitespace-nowrap flex items-center gap-1" id="cardManaCost">
+                            {% if card.mana_cost %}{{ card.mana_cost|mana_symbols|raw }}{% endif %}
+                        </div>
                     </div>
                     
                     <div class="flex items-center gap-3 mb-3">
                         <span class="bg-[#FF8C00] text-black px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-['Space_Grotesk']">
                             {{ card.rarity }}
                         </span>
-                        {% if card.colors|length > 0 %}
-                            <div class="flex gap-1">
+                        <div class="flex gap-1" id="cardColors">
+                            {% if card.colors|length > 0 %}
                                 {% for color in card.colors %}
                                     <div class="w-4 h-4 rounded-full border border-white/30 {{ color == 'W' ? 'bg-yellow-50' : color == 'U' ? 'bg-blue-600' : color == 'B' ? 'bg-purple-900' : color == 'R' ? 'bg-red-600' : 'bg-green-600' }}"></div>
                                 {% endfor %}
-                            </div>
-                        {% endif %}
-                        {% if card.power %}
-                            <span class="ml-auto text-lg font-bold text-white font-['Space_Grotesk']">{{ card.power }}/{{ card.toughness }}</span>
-                        {% endif %}
-                        {% if card.loyalty %}
-                            <span class="ml-auto text-lg font-bold text-white font-['Space_Grotesk']">Loyalty: {{ card.loyalty }}</span>
-                        {% endif %}
+                            {% endif %}
+                        </div>
+                        <span class="ml-auto text-lg font-bold text-white font-['Space_Grotesk']" id="cardStats">
+                            {% if card.power %}{{ card.power }}/{{ card.toughness }}{% endif %}
+                            {% if card.loyalty %}Loyalty: {{ card.loyalty }}{% endif %}
+                        </span>
                     </div>
 
-                    <p class="text-sm text-zinc-300 font-['Space_Grotesk'] italic">{{ card.type_line }}</p>
+                    <div id="cardTypeLineContainer" class="text-sm font-['Space_Grotesk'] italic">
+                        <!-- Type line will be rendered here with clickable types -->
+                    </div>
                 </div>
 
                 <!-- Oracle Text -->
-                {% if card.oracle_text %}
-                    <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl">
-                        <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Rules Text</h2>
-                        <div class="text-sm text-zinc-200 font-['Space_Grotesk'] leading-relaxed whitespace-pre-line">{{ card.oracle_text }}</div>
-                    </div>
-                {% endif %}
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl" id="oracleTextContainer" {% if not card.oracle_text %}style="display:none;"{% endif %}>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Rules Text</h2>
+                    <div class="text-sm text-zinc-200 font-['Space_Grotesk'] leading-relaxed" id="cardOracleText">{{ card.oracle_text|nl2br|mana_symbols|raw }}</div>
+                </div>
 
                 <!-- Flavor Text -->
-                {% if card.flavor_text %}
-                    <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl">
-                        <div class="text-sm text-zinc-400 font-['Space_Grotesk'] italic leading-relaxed">{{ card.flavor_text }}</div>
-                    </div>
-                {% endif %}
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-4 rounded-xl" id="flavorTextContainer" {% if not card.flavor_text %}style="display:none;"{% endif %}>
+                    <div class="text-sm text-zinc-400 font-['Space_Grotesk'] italic leading-relaxed" id="cardFlavorText">{{ card.flavor_text }}</div>
+                </div>
 
                 <!-- Keywords -->
                 {% if card.keywords|length > 0 %}
@@ -195,4 +195,171 @@
         </div>
     </div>
 </main>
+
+<script>
+    // Card flip functionality for double-faced cards
+    const cardData = {{ card|json_encode|raw }};
+    let currentFaceIndex = 0;
+
+    // Known card types for parsing
+    const SUPERTYPES = ['legendary', 'world', 'snow', 'basic', 'ongoing', 'elite', 'host'];
+    const CARD_TYPES = ['artifact', 'creature', 'enchantment', 'land', 'planeswalker', 'instant', 'sorcery', 'tribal', 'battle', 'kindred', 'conspiracy', 'phenomenon', 'plane', 'scheme', 'vanguard'];
+
+    // Function to replace mana symbols with SVG images
+    function replaceManaSymbols(text) {
+        if (!text) return '';
+        return text.replace(/\{([^}]+)\}/g, function(match, symbol) {
+            const symbolName = symbol.replace(/\//g, '');
+            return `<img src="https://svgs.scryfall.io/card-symbols/${symbolName}.svg" class="mana-symbol" alt="${match}" title="${match}">`;
+        });
+    }
+
+    // Initialize type line on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        renderTypeLine(cardData.type_line);
+    });
+
+    function renderTypeLine(typeLine) {
+        if (!typeLine) return;
+        
+        const container = document.getElementById('cardTypeLineContainer');
+        if (!container) return;
+
+        // Split by em-dash or regular dash to separate main types from subtypes
+        const parts = typeLine.split(/\s+[—\-]\s+/);
+        const mainTypes = parts[0] || '';
+        const subTypes = parts[1] || '';
+
+        let html = '';
+
+        // Parse main types (supertypes + card types)
+        if (mainTypes) {
+            const words = mainTypes.split(/\s+/);
+            words.forEach((word, index) => {
+                const lowerWord = word.toLowerCase();
+                const isSupertype = SUPERTYPES.includes(lowerWord);
+                const isCardType = CARD_TYPES.includes(lowerWord);
+
+                if (isSupertype || isCardType) {
+                    html += `<a href="{{ path('app_card_search') }}?q=t:${encodeURIComponent(lowerWord)}" class="text-zinc-300 hover:text-[#FF8C00] hover:underline transition-colors">${word}</a>`;
+                } else {
+                    html += `<span class="text-zinc-300">${word}</span>`;
+                }
+
+                if (index < words.length - 1) {
+                    html += ' ';
+                }
+            });
+        }
+
+        // Add separator
+        if (subTypes) {
+            html += ' <span class="text-zinc-500">—</span> ';
+
+            // Parse subtypes
+            const subTypeWords = subTypes.split(/\s+/);
+            subTypeWords.forEach((word, index) => {
+                html += `<a href="{{ path('app_card_search') }}?q=t:${encodeURIComponent(word.toLowerCase())}" class="text-zinc-300 hover:text-[#FF8C00] hover:underline transition-colors">${word}</a>`;
+                
+                if (index < subTypeWords.length - 1) {
+                    html += ' ';
+                }
+            });
+        }
+
+        container.innerHTML = html;
+    }
+
+    function flipCard() {
+        const faces = document.querySelectorAll('.card-face');
+        if (faces.length <= 1) return;
+
+        // Hide current face
+        faces[currentFaceIndex].classList.add('hidden');
+        
+        // Show next face
+        currentFaceIndex = (currentFaceIndex + 1) % faces.length;
+        faces[currentFaceIndex].classList.remove('hidden');
+
+        // Update card information if card_faces data exists
+        if (cardData.card_faces && cardData.card_faces[currentFaceIndex]) {
+            updateCardInfo(cardData.card_faces[currentFaceIndex]);
+        }
+    }
+
+    function updateCardInfo(faceData) {
+        // Update card name
+        const cardName = document.getElementById('cardName');
+        if (cardName && faceData.name) {
+            cardName.textContent = faceData.name;
+        }
+
+        // Update mana cost
+        const cardManaCost = document.getElementById('cardManaCost');
+        if (cardManaCost) {
+            cardManaCost.innerHTML = replaceManaSymbols(faceData.mana_cost || '');
+        }
+
+        // Update type line with clickable types
+        if (faceData.type_line) {
+            renderTypeLine(faceData.type_line);
+        }
+
+        // Update oracle text
+        const cardOracleText = document.getElementById('cardOracleText');
+        const oracleTextContainer = document.getElementById('oracleTextContainer');
+        if (cardOracleText && oracleTextContainer) {
+            if (faceData.oracle_text) {
+                // Replace line breaks and mana symbols
+                const textWithBreaks = faceData.oracle_text.replace(/\n/g, '<br>');
+                cardOracleText.innerHTML = replaceManaSymbols(textWithBreaks);
+                oracleTextContainer.style.display = 'block';
+            } else {
+                oracleTextContainer.style.display = 'none';
+            }
+        }
+
+        // Update flavor text
+        const cardFlavorText = document.getElementById('cardFlavorText');
+        const flavorTextContainer = document.getElementById('flavorTextContainer');
+        if (cardFlavorText && flavorTextContainer) {
+            if (faceData.flavor_text) {
+                cardFlavorText.textContent = faceData.flavor_text;
+                flavorTextContainer.style.display = 'block';
+            } else {
+                flavorTextContainer.style.display = 'none';
+            }
+        }
+
+        // Update colors
+        const cardColors = document.getElementById('cardColors');
+        if (cardColors && faceData.colors) {
+            cardColors.innerHTML = '';
+            faceData.colors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'w-4 h-4 rounded-full border border-white/30';
+                
+                if (color === 'W') colorDiv.classList.add('bg-yellow-50');
+                else if (color === 'U') colorDiv.classList.add('bg-blue-600');
+                else if (color === 'B') colorDiv.classList.add('bg-purple-900');
+                else if (color === 'R') colorDiv.classList.add('bg-red-600');
+                else if (color === 'G') colorDiv.classList.add('bg-green-600');
+                
+                cardColors.appendChild(colorDiv);
+            });
+        }
+
+        // Update power/toughness or loyalty
+        const cardStats = document.getElementById('cardStats');
+        if (cardStats) {
+            if (faceData.power && faceData.toughness) {
+                cardStats.textContent = `${faceData.power}/${faceData.toughness}`;
+            } else if (faceData.loyalty) {
+                cardStats.textContent = `Loyalty: ${faceData.loyalty}`;
+            } else {
+                cardStats.textContent = '';
+            }
+        }
+    }
+</script>
 {% endblock %}

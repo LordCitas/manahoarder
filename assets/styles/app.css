@@ -1,3 +1,14 @@
 body {
     background-color: skyblue;
 }
+
+/* Estilos para los iconos de maná y habilidades */
+.mana-symbol {
+    display: inline-block;
+    width: 1.1em;      /* Se adapta proporcionalmente al tamaño de letra del contenedor */
+    height: 1.1em;
+    vertical-align: middle; /* Se alinea perfectamente en el centro de la línea de texto */
+    margin: 0 0.1em;   /* Un pequeño espacio a los lados para que no choque con las letras */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3); /* Un sutil sombreado para darles relieve */
+    border-radius: 50%; /* La mayoría son redondos, esto suaviza los bordes */
+}

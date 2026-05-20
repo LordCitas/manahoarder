@@ -94,6 +94,11 @@ class CardController extends AbstractController
                     'rarity' => $cardData['rarity'] ?? '',
                 ];
             }
+            
+            // If exactly one result, redirect to card view
+            if (count($cards) === 1) {
+                return $this->redirectToRoute('app_card_view', ['id' => $cards[0]['id']]);
+            }
         }
 
         return $this->render('card/search.html.twig', [
