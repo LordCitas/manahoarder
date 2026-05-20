@@ -28,6 +28,9 @@ class ScryfallCard
     #[ORM\Column(length: 500)]
     private ?string $imageUrl = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $artCropUrl = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $type = null;
 
@@ -100,6 +103,18 @@ class ScryfallCard
     public function setImageUrl(string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+
+        return $this;
+    }
+
+    public function getArtCropUrl(): ?string
+    {
+        return $this->artCropUrl;
+    }
+
+    public function setArtCropUrl(?string $artCropUrl): static
+    {
+        $this->artCropUrl = $artCropUrl;
 
         return $this;
     }

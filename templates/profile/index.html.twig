@@ -1,0 +1,269 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile - ManaHoarder{% endblock %}
+
+{% block body %}
+<main class="min-h-screen">
+    <div class="max-w-[1440px] mx-auto p-8 lg:p-12">
+        
+        <div class="mb-10">
+            <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">My Profile</h1>
+            <p class="text-zinc-300 text-lg">Manage your account settings and preferences.</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+            <div class="mb-6 bg-green-900/20 border border-green-900/60 text-green-100 px-6 py-4 rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-500">check_circle</span>
+                <span class="font-['Space_Grotesk'] text-sm">{{ message }}</span>
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="mb-6 bg-red-900/20 border border-red-900/60 text-red-100 px-6 py-4 rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <span class="font-['Space_Grotesk'] text-sm">{{ message }}</span>
+            </div>
+        {% endfor %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column: Profile Picture & Basic Info -->
+            <div class="space-y-6">
+                <!-- Profile Picture -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-4">Profile Picture</h2>
+                    
+                    <div class="flex flex-col items-center mb-6">
+                        {% if user.profileArtUrl %}
+                            <img src="{{ user.profileArtUrl }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
+                        {% elseif user.profilePictureFilename %}
+                            <img src="/uploads/profile-pictures/{{ user.profilePictureFilename }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
+                        {% else %}
+                            <div class="w-32 h-32 rounded-lg bg-zinc-800 border-2 border-[#2A2A2A] flex items-center justify-center mb-3">
+                                <span class="material-symbols-outlined text-zinc-500" style="font-size: 80px;">person</span>
+                            </div>
+                        {% endif %}
+                        <p class="text-base text-white font-semibold font-['Space_Grotesk']">{{ user.nickname }}</p>
+                        <p class="text-xs text-zinc-500">{{ user.email }}</p>
+                    </div>
+
+                    <button onclick="document.getElementById('pictureModal').classList.remove('hidden')" class="w-full bg-[#FF8C00] text-black px-4 py-2.5 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all">
+                        Change Picture
+                    </button>
+                </div>
+
+                <!-- Account Info -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-4">Account Information</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-xs text-zinc-500 font-['Space_Grotesk']">Nickname</span>
+                            <p class="text-sm text-zinc-200 font-['Space_Grotesk'] font-semibold">{{ user.nickname }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-zinc-500 font-['Space_Grotesk']">Member Since</span>
+                            <p class="text-sm text-zinc-200 font-['Space_Grotesk'] font-semibold">{{ user.createdAt|date('M d, Y') }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-zinc-500 font-['Space_Grotesk']">Account Status</span>
+                            <p class="text-sm text-green-500 font-['Space_Grotesk'] font-semibold">Active</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Settings Forms -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Update Nickname -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-4">Update Nickname</h2>
+                    <form method="post" action="{{ path('app_profile_update_nickname') }}" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Nickname</label>
+                            <input 
+                                type="text" 
+                                name="nickname"
+                                value="{{ user.nickname }}"
+                                placeholder="Enter your nickname" 
+                                minlength="3"
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                required
+                            >
+                            <p class="mt-1 text-xs text-zinc-500">Minimum 3 characters</p>
+                        </div>
+                        <button type="submit" class="bg-[#FF8C00] text-black px-6 py-2.5 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all">
+                            Update Nickname
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Change Password -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-4">Change Password</h2>
+                    <form method="post" action="{{ path('app_profile_update_password') }}" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Current Password</label>
+                            <input 
+                                type="password" 
+                                name="current_password"
+                                placeholder="Enter current password" 
+                                class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                required
+                            >
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">New Password</label>
+                                <input 
+                                    type="password" 
+                                    name="new_password"
+                                    placeholder="Enter new password" 
+                                    minlength="6"
+                                    class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                    required
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Confirm Password</label>
+                                <input 
+                                    type="password" 
+                                    name="confirm_password"
+                                    placeholder="Confirm new password" 
+                                    minlength="6"
+                                    class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        <p class="text-xs text-zinc-500">Password must be at least 6 characters long</p>
+                        <button type="submit" class="bg-[#FF8C00] text-black px-6 py-2.5 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all">
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Statistics (Optional) -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] p-6 rounded-xl">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-4">Your Statistics</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-[#FF8C00] font-['Space_Grotesk']">0</p>
+                            <p class="text-xs text-zinc-500 font-['Space_Grotesk']">Decks</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-[#FF8C00] font-['Space_Grotesk']">0</p>
+                            <p class="text-xs text-zinc-500 font-['Space_Grotesk']">Albums</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-[#FF8C00] font-['Space_Grotesk']">0</p>
+                            <p class="text-xs text-zinc-500 font-['Space_Grotesk']">Tournaments</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-[#FF8C00] font-['Space_Grotesk']">0</p>
+                            <p class="text-xs text-zinc-500 font-['Space_Grotesk']">Cards</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Change Picture Modal -->
+<div id="pictureModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121212] border border-[#2A2A2A] rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="font-['Space_Grotesk'] text-xl font-bold text-white uppercase tracking-tight">Select Card Art</h2>
+            <button onclick="document.getElementById('pictureModal').classList.add('hidden')" class="text-zinc-500 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Card Art Selection -->
+        <div id="cardArtContent">
+            <div class="mb-4">
+                <p class="text-xs text-zinc-400 font-['Space_Grotesk'] mb-3">Select from your card collection:</p>
+                <div id="cardArtResults" class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                    {% if userCards|length > 0 %}
+                        {% for userCard in userCards %}
+                            {% set card = userCard.scryfallCard %}
+                            {% if card.artCropUrl %}
+                                <button 
+                                    type="button"
+                                    onclick="selectCardArt({{ card.id }}, '{{ card.artCropUrl }}', '{{ card.name }}')"
+                                    class="group relative overflow-hidden rounded border-2 border-[#2A2A2A] hover:border-[#FF8C00] transition-all"
+                                    title="{{ card.name }}"
+                                >
+                                    <img src="{{ card.artCropUrl }}" alt="{{ card.name }}" class="w-full h-auto aspect-[3/4] object-cover group-hover:opacity-80 transition-opacity">
+                                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[#FF8C00] text-xl">check_circle</span>
+                                    </div>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="col-span-full text-center text-sm text-zinc-500 py-8">No cards in your collection with art crop available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Select card art
+    function selectCardArt(cardId, artUrl, cardName) {
+        const modal = document.getElementById('pictureModal');
+        
+        // Show loading state
+        const selectedButton = event.target.closest('button');
+        selectedButton.classList.add('opacity-50', 'cursor-wait');
+        
+        fetch('{{ path('app_profile_set_card_art', {cardId: 0}) }}'.replace('0', cardId), {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update profile picture immediately
+                const profileImg = document.querySelector('.w-32.h-32.rounded-lg');
+                if (profileImg && profileImg.tagName === 'IMG') {
+                    profileImg.src = artUrl;
+                }
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-900/20 border border-green-900/60 text-green-100 px-6 py-4 rounded-xl flex items-center gap-3 z-50 animate-pulse';
+                successMsg.innerHTML = `<span class="material-symbols-outlined text-green-500">check_circle</span><span class="font-['Space_Grotesk'] text-sm">Profile picture updated with ${cardName}</span>`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => successMsg.remove(), 3000);
+                setTimeout(() => modal.classList.add('hidden'), 500);
+            } else {
+                alert('Failed to update profile picture: ' + data.message);
+            }
+            selectedButton.classList.remove('opacity-50', 'cursor-wait');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update profile picture');
+            selectedButton.classList.remove('opacity-50', 'cursor-wait');
+        });
+    }
+
+    // Close modal
+    document.getElementById('pictureModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}
