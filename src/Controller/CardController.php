@@ -208,6 +208,7 @@ class CardController extends AbstractController
                 'images' => $images,
                 'keywords' => $cardData['keywords'] ?? [],
                 'card_faces' => $cardData['card_faces'] ?? null,
+                'layout' => $cardData['layout'] ?? 'normal',
             ];
             
             return $this->render('card/view.html.twig', [

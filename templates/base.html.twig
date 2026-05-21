@@ -43,6 +43,11 @@
                 animation: flipIn 0.6s ease-in-out;
             }
             
+            /* 180° rotation for flip cards */
+            .card-face.rotating {
+                transition: transform 0.8s ease-in-out;
+            }
+            
             @keyframes flipOut {
                 0% {
                     transform: rotateY(0deg) scale(1);
