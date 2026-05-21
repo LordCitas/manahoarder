@@ -204,9 +204,9 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {% for card in cards %}
                     <a href="{{ path('app_card_view', {id: card.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded overflow-hidden group">
-                        <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900">
+                        <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900 rounded-[0.75rem]">
                             {% if card.image %}
-                                <img alt="{{ card.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="{{ card.image }}"/>
+                                <img alt="{{ card.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded-[0.75rem]" src="{{ card.image }}"/>
                             {% else %}
                                 <div class="w-full h-full flex items-center justify-center">
                                     <span class="material-symbols-outlined text-6xl text-zinc-700">style</span>

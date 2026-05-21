@@ -22,15 +22,15 @@
                     <div class="bg-[#1A1B1E] border border-[#2A2A2A] rounded-xl overflow-hidden relative" id="cardImageContainer">
                         {% if card.images|length > 1 %}
                             <!-- Flip button for double-faced cards -->
-                            <button onclick="flipCard()" class="absolute top-3 right-3 z-10 bg-black/70 hover:bg-[#FF8C00] text-white hover:text-black p-2 rounded-lg transition-all backdrop-blur-sm border border-white/20 hover:border-[#FF8C00]" title="Flip card">
-                                <span class="material-symbols-outlined text-xl">sync</span>
+                            <button onclick="flipCard()" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-[#FF8C00] hover:bg-[#ff9d26] text-black w-14 h-14 rounded-full transition-all backdrop-blur-sm border-2 border-black/30 hover:border-black/50 shadow-xl flex items-center justify-center" title="Flip card">
+                                <span class="material-symbols-outlined text-3xl font-bold">sync</span>
                             </button>
                         {% endif %}
                         
                         {% for image in card.images %}
                             <div class="card-face {{ loop.index0 > 0 ? 'hidden' : '' }}" data-face-index="{{ loop.index0 }}">
                                 {% if image.large %}
-                                    <img src="{{ image.large }}" alt="{{ image.name ?? card.name }}" class="w-full h-auto">
+                                    <img src="{{ image.large }}" alt="{{ image.name ?? card.name }}" class="w-full h-auto rounded-[1.5rem]">
                                 {% else %}
                                     <div class="aspect-[5/7] flex items-center justify-center bg-zinc-900">
                                         <span class="material-symbols-outlined text-8xl text-zinc-700">style</span>
