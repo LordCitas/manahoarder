@@ -64,7 +64,7 @@ class CardController extends AbstractController
             'types' => $request->query->all('types') ?? [],
             'rarity' => $request->query->get('rarity', ''),
             'colors' => $request->query->all('colors') ?? [],
-            'colorIdentity' => $request->query->get('color_identity', ''),
+            'colorIdentity' => $request->query->all('color_identity') ?? [],
             'format' => $request->query->get('format', ''),
             'cmc' => $request->query->get('cmc', ''),
             'artist' => $request->query->get('artist', ''),
@@ -143,8 +143,11 @@ class CardController extends AbstractController
             }
         }
         
-        if (!empty($filters['colorIdentity'])) {
-            $parts[] = 'id:' . $filters['colorIdentity'];
+        if (!empty($filters['colorIdentity']) && is_array($filters['colorIdentity'])) {
+            $colorString = implode('', $filters['colorIdentity']);
+            if (!empty($colorString)) {
+                $parts[] = 'id:' . $colorString;
+            }
         }
         
         if (!empty($filters['format'])) {

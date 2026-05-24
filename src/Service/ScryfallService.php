@@ -143,7 +143,7 @@ class ScryfallService
     }
 
     /**
-     * Autocomplete for card types
+     * Autocomplete for card types, supertypes, and subtypes (Type line)
      */
     public function autocompleteTypes(string $query): array
     {
@@ -152,26 +152,102 @@ class ScryfallService
         }
 
         try {
+            $allTypes = [];
+            
+            // Get card types
             $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/card-types', [
                 'headers' => [
                     'User-Agent' => self::USER_AGENT,
                     'Accept' => 'application/json',
                 ]
             ]);
-
-            if ($response->getStatusCode() !== 200) {
-                return [];
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
             }
-
-            $data = $response->toArray();
-            $types = $data['data'] ?? [];
             
-            // Filter types that match the query
-            $filtered = array_filter($types, function($type) use ($query) {
+            // Get supertypes
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/supertypes', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Get subtypes
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/artifact-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Get creature types
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/creature-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Get enchantment types
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/enchantment-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Get land types
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/land-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Get planeswalker types
+            $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/catalog/planeswalker-types', [
+                'headers' => [
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                $allTypes = array_merge($allTypes, $data['data'] ?? []);
+            }
+            
+            // Remove duplicates and sort
+            $allTypes = array_unique($allTypes);
+            sort($allTypes);
+            
+            // Filter types that match the query (case-insensitive)
+            $filtered = array_filter($allTypes, function($type) use ($query) {
                 return stripos($type, $query) !== false;
             });
             
-            return array_slice(array_values($filtered), 0, 10);
+            return array_slice(array_values($filtered), 0, 15);
         } catch (\Exception $e) {
             return [];
         }
@@ -279,6 +355,21 @@ class ScryfallService
         } catch (\Exception $e) {
             return [];
         }
+    }
+
+    /**
+     * Get all card colors for filter
+     */
+    public function getAllColors(): array
+    {
+        return [
+            ['code' => 'W', 'name' => 'White'],
+            ['code' => 'U', 'name' => 'Blue'],
+            ['code' => 'B', 'name' => 'Black'],
+            ['code' => 'R', 'name' => 'Red'],
+            ['code' => 'G', 'name' => 'Green'],
+            ['code' => 'C', 'name' => 'Colorless'],
+        ];
     }
 
     /**

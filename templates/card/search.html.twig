@@ -46,14 +46,14 @@
                 <div id="advancedFilters" class="hidden">
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         
-                        <!-- Card Type with Multi-Select -->
+                        <!-- Type Line with Multi-Select -->
                         <div class="md:col-span-2 lg:col-span-3">
-                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Card Type</label>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Type Line</label>
                             <div class="relative">
                                 <input 
                                     type="text" 
                                     id="typeInput"
-                                    placeholder="e.g., creature, legendary, instant" 
+                                    placeholder="e.g., creature, legendary, instant, human" 
                                     class="w-full bg-[#121212] border border-[#2A2A2A] py-3 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
                                     autocomplete="off"
                                 >
@@ -127,9 +127,9 @@
                             </div>
                         </div>
 
-                        <!-- Set/Expansion with Autocomplete -->
+                        <!-- Set with Autocomplete -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Set Code</label>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Set</label>
                             <div class="relative">
                                 <input 
                                     type="text" 
@@ -144,36 +144,80 @@
                             </div>
                         </div>
 
-                        <!-- Color Identity -->
+                        <!-- Colors with Visual Selection -->
                         <div class="md:col-span-2 lg:col-span-3">
                             <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Colors</label>
                             <div class="flex flex-wrap gap-3">
-                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-white/50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="colors[]" value="W" {{ 'W' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
-                                    <div class="w-5 h-5 rounded-full bg-yellow-50 border border-white/20"></div>
-                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">White</span>
-                                </label>
-                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-blue-500/50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="colors[]" value="U" {{ 'U' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
-                                    <div class="w-5 h-5 rounded-full bg-blue-600 border border-white/20"></div>
-                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Blue</span>
-                                </label>
-                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-purple-500/50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="colors[]" value="B" {{ 'B' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
-                                    <div class="w-5 h-5 rounded-full bg-purple-900 border border-white/20"></div>
-                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Black</span>
-                                </label>
-                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-red-500/50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="colors[]" value="R" {{ 'R' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
-                                    <div class="w-5 h-5 rounded-full bg-red-600 border border-white/20"></div>
-                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Red</span>
-                                </label>
-                                <label class="flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded hover:border-green-500/50 transition-all cursor-pointer">
-                                    <input type="checkbox" name="colors[]" value="G" {{ 'G' in filters.colors ? 'checked' : '' }} class="w-4 h-4 rounded border-[#2A2A2A] bg-[#121212] text-[#FF8C00] focus:ring-[#FF8C00]">
-                                    <div class="w-5 h-5 rounded-full bg-green-600 border border-white/20"></div>
-                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk']">Green</span>
-                                </label>
+                                <!-- White -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'W' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'W')" data-color="W">
+                                    <img src="https://svgs.scryfall.io/card-symbols/w.svg" alt="White" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'W' in filters.colors %}text-black font-bold{% endif %}">White</span>
+                                </button>
+                                <!-- Blue -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'U' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'U')" data-color="U">
+                                    <img src="https://svgs.scryfall.io/card-symbols/u.svg" alt="Blue" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'U' in filters.colors %}text-black font-bold{% endif %}">Blue</span>
+                                </button>
+                                <!-- Black -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'B' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'B')" data-color="B">
+                                    <img src="https://svgs.scryfall.io/card-symbols/b.svg" alt="Black" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'B' in filters.colors %}text-black font-bold{% endif %}">Black</span>
+                                </button>
+                                <!-- Red -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'R' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'R')" data-color="R">
+                                    <img src="https://svgs.scryfall.io/card-symbols/r.svg" alt="Red" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'R' in filters.colors %}text-black font-bold{% endif %}">Red</span>
+                                </button>
+                                <!-- Green -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'G' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'G')" data-color="G">
+                                    <img src="https://svgs.scryfall.io/card-symbols/g.svg" alt="Green" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'G' in filters.colors %}text-black font-bold{% endif %}">Green</span>
+                                </button>
+                                <!-- Colorless -->
+                                <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'C' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'C')" data-color="C">
+                                    <img src="https://svgs.scryfall.io/card-symbols/c.svg" alt="Colorless" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'C' in filters.colors %}text-black font-bold{% endif %}">Colorless</span>
+                                </button>
                             </div>
+                            <div id="colorsContainer"></div>
+                        </div>
+
+                        <!-- Color Identity with Visual Selection -->
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-2">Color Identity</label>
+                            <div class="flex flex-wrap gap-3">
+                                <!-- White -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'W' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'W')" data-color="W">
+                                    <img src="https://svgs.scryfall.io/card-symbols/w.svg" alt="White" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'W' in filters.colorIdentity %}text-black font-bold{% endif %}">White</span>
+                                </button>
+                                <!-- Blue -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'U' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'U')" data-color="U">
+                                    <img src="https://svgs.scryfall.io/card-symbols/u.svg" alt="Blue" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'U' in filters.colorIdentity %}text-black font-bold{% endif %}">Blue</span>
+                                </button>
+                                <!-- Black -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'B' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'B')" data-color="B">
+                                    <img src="https://svgs.scryfall.io/card-symbols/b.svg" alt="Black" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'B' in filters.colorIdentity %}text-black font-bold{% endif %}">Black</span>
+                                </button>
+                                <!-- Red -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'R' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'R')" data-color="R">
+                                    <img src="https://svgs.scryfall.io/card-symbols/r.svg" alt="Red" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'R' in filters.colorIdentity %}text-black font-bold{% endif %}">Red</span>
+                                </button>
+                                <!-- Green -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'G' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'G')" data-color="G">
+                                    <img src="https://svgs.scryfall.io/card-symbols/g.svg" alt="Green" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'G' in filters.colorIdentity %}text-black font-bold{% endif %}">Green</span>
+                                </button>
+                                <!-- Colorless -->
+                                <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'C' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'C')" data-color="C">
+                                    <img src="https://svgs.scryfall.io/card-symbols/c.svg" alt="Colorless" class="w-5 h-5">
+                                    <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'C' in filters.colorIdentity %}text-black font-bold{% endif %}">Colorless</span>
+                                </button>
+                            </div>
+                            <div id="colorIdentityContainer"></div>
                         </div>
 
                     </div>
@@ -184,7 +228,7 @@
                             <span class="material-symbols-outlined text-base">search</span>
                             Apply Filters
                         </button>
-                        <button type="button" onclick="window.location.href='{{ path('app_card_search') }}'" class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all">
+                        <button type="button" onclick="clearFilters()" class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all">
                             Clear All
                         </button>
                     </div>
@@ -281,10 +325,121 @@
     });
 
     // Auto-expand if filters are active
-    {% if filters.types|length > 0 or filters.rarity or filters.format or filters.cmc or filters.artist or filters.set or filters.colors|length > 0 %}
+    {% if filters.types|length > 0 or filters.rarity or filters.format or filters.cmc or filters.artist or filters.set or filters.colors|length > 0 or filters.colorIdentity|length > 0 %}
         filtersPanel.classList.remove('hidden');
         filterIcon.textContent = 'expand_less';
     {% endif %}
+
+    // Initialize color containers with existing filters
+    const colorsContainer = document.getElementById('colorsContainer');
+    const colorIdentityContainer = document.getElementById('colorIdentityContainer');
+    
+    // Add existing color filters to container
+    {% for color in filters.colors %}
+        const colorInput = document.createElement('input');
+        colorInput.type = 'hidden';
+        colorInput.name = 'colors[]';
+        colorInput.value = '{{ color }}';
+        colorsContainer.appendChild(colorInput);
+    {% endfor %}
+    
+    // Add existing color identity filters to container
+    {% for color in filters.colorIdentity %}
+        const colorIdInput = document.createElement('input');
+        colorIdInput.type = 'hidden';
+        colorIdInput.name = 'color_identity[]';
+        colorIdInput.value = '{{ color }}';
+        colorIdentityContainer.appendChild(colorIdInput);
+    {% endfor %}
+
+    // Toggle color selection function
+    function toggleColor(event, button, fieldName, colorCode) {
+        event.preventDefault();
+        
+        const isSelected = button.classList.contains('bg-[#FF8C00]');
+        const containerName = fieldName === 'colors' ? 'colorsContainer' : 'colorIdentityContainer';
+        const container = document.getElementById(containerName);
+        
+        if (isSelected) {
+            // Deselect
+            button.classList.remove('bg-[#FF8C00]');
+            button.classList.add('bg-[#121212]');
+            const spans = button.querySelectorAll('span');
+            spans.forEach(span => {
+                if (span.classList.contains('text-black')) {
+                    span.classList.remove('text-black', 'font-bold');
+                    span.classList.add('text-zinc-200');
+                }
+            });
+            // Remove hidden input
+            const hiddenInput = container.querySelector(`input[value="${colorCode}"]`);
+            if (hiddenInput) hiddenInput.remove();
+        } else {
+            // Select
+            button.classList.remove('bg-[#121212]');
+            button.classList.add('bg-[#FF8C00]');
+            const spans = button.querySelectorAll('span');
+            spans.forEach(span => {
+                if (span.classList.contains('text-zinc-200')) {
+                    span.classList.remove('text-zinc-200');
+                    span.classList.add('text-black', 'font-bold');
+                }
+            });
+            // Create hidden input
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = fieldName + '[]';
+            hiddenInput.value = colorCode;
+            container.appendChild(hiddenInput);
+        }
+    }
+
+    // Clear filters function
+    function clearFilters() {
+        event.preventDefault();
+        
+        // Clear text inputs
+        document.getElementById('typeInput').value = '';
+        document.getElementById('artistInput').value = '';
+        document.getElementById('setInput').value = '';
+        document.querySelector('input[name="cmc"]').value = '';
+        
+        // Clear rarity and format selects
+        document.querySelector('select[name="rarity"]').value = '';
+        document.querySelector('select[name="format"]').value = '';
+        
+        // Remove all selected types
+        selectedTypes = [];
+        document.getElementById('selectedTypes').innerHTML = '';
+        
+        // Deselect all color buttons
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.classList.remove('bg-[#FF8C00]');
+            btn.classList.add('bg-[#121212]');
+            const spans = btn.querySelectorAll('span');
+            spans.forEach(span => {
+                if (span.classList.contains('text-black')) {
+                    span.classList.remove('text-black', 'font-bold');
+                    span.classList.add('text-zinc-200');
+                }
+            });
+        });
+        document.getElementById('colorsContainer').innerHTML = '';
+        
+        // Deselect all color identity buttons
+        document.querySelectorAll('.color-identity-btn').forEach(btn => {
+            btn.classList.remove('bg-[#FF8C00]');
+            btn.classList.add('bg-[#121212]');
+            const spans = btn.querySelectorAll('span');
+            spans.forEach(span => {
+                if (span.classList.contains('text-black')) {
+                    span.classList.remove('text-black', 'font-bold');
+                    span.classList.add('text-zinc-200');
+                }
+            });
+        });
+        document.getElementById('colorIdentityContainer').innerHTML = '';
+    }
 
     // Card Type Multi-Select
     const typeInput = document.getElementById('typeInput');
