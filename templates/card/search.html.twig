@@ -150,32 +150,32 @@
                             <div class="flex flex-wrap gap-3">
                                 <!-- White -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'W' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'W')" data-color="W">
-                                    <img src="https://svgs.scryfall.io/card-symbols/w.svg" alt="White" class="w-5 h-5">
+                                    {{ mana_symbol('w')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'W' in filters.colors %}text-black font-bold{% endif %}">White</span>
                                 </button>
                                 <!-- Blue -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'U' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'U')" data-color="U">
-                                    <img src="https://svgs.scryfall.io/card-symbols/u.svg" alt="Blue" class="w-5 h-5">
+                                    {{ mana_symbol('u')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'U' in filters.colors %}text-black font-bold{% endif %}">Blue</span>
                                 </button>
                                 <!-- Black -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'B' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'B')" data-color="B">
-                                    <img src="https://svgs.scryfall.io/card-symbols/b.svg" alt="Black" class="w-5 h-5">
+                                    {{ mana_symbol('b')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'B' in filters.colors %}text-black font-bold{% endif %}">Black</span>
                                 </button>
                                 <!-- Red -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'R' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'R')" data-color="R">
-                                    <img src="https://svgs.scryfall.io/card-symbols/r.svg" alt="Red" class="w-5 h-5">
+                                    {{ mana_symbol('r')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'R' in filters.colors %}text-black font-bold{% endif %}">Red</span>
                                 </button>
                                 <!-- Green -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'G' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'G')" data-color="G">
-                                    <img src="https://svgs.scryfall.io/card-symbols/g.svg" alt="Green" class="w-5 h-5">
+                                    {{ mana_symbol('g')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'G' in filters.colors %}text-black font-bold{% endif %}">Green</span>
                                 </button>
                                 <!-- Colorless -->
                                 <button type="button" class="color-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'C' in filters.colors %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'colors', 'C')" data-color="C">
-                                    <img src="https://svgs.scryfall.io/card-symbols/c.svg" alt="Colorless" class="w-5 h-5">
+                                    {{ mana_symbol('c')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'C' in filters.colors %}text-black font-bold{% endif %}">Colorless</span>
                                 </button>
                             </div>
@@ -188,32 +188,32 @@
                             <div class="flex flex-wrap gap-3">
                                 <!-- White -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'W' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'W')" data-color="W">
-                                    <img src="https://svgs.scryfall.io/card-symbols/w.svg" alt="White" class="w-5 h-5">
+                                    {{ mana_symbol('w')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'W' in filters.colorIdentity %}text-black font-bold{% endif %}">White</span>
                                 </button>
                                 <!-- Blue -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'U' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'U')" data-color="U">
-                                    <img src="https://svgs.scryfall.io/card-symbols/u.svg" alt="Blue" class="w-5 h-5">
+                                    {{ mana_symbol('u')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'U' in filters.colorIdentity %}text-black font-bold{% endif %}">Blue</span>
                                 </button>
                                 <!-- Black -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'B' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'B')" data-color="B">
-                                    <img src="https://svgs.scryfall.io/card-symbols/b.svg" alt="Black" class="w-5 h-5">
+                                    {{ mana_symbol('b')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'B' in filters.colorIdentity %}text-black font-bold{% endif %}">Black</span>
                                 </button>
                                 <!-- Red -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'R' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'R')" data-color="R">
-                                    <img src="https://svgs.scryfall.io/card-symbols/r.svg" alt="Red" class="w-5 h-5">
+                                    {{ mana_symbol('r')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'R' in filters.colorIdentity %}text-black font-bold{% endif %}">Red</span>
                                 </button>
                                 <!-- Green -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'G' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'G')" data-color="G">
-                                    <img src="https://svgs.scryfall.io/card-symbols/g.svg" alt="Green" class="w-5 h-5">
+                                    {{ mana_symbol('g')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'G' in filters.colorIdentity %}text-black font-bold{% endif %}">Green</span>
                                 </button>
                                 <!-- Colorless -->
                                 <button type="button" class="color-identity-btn flex items-center gap-2 bg-[#121212] border border-[#2A2A2A] py-3 px-4 rounded transition-all cursor-pointer hover:border-white/50 {% if 'C' in filters.colorIdentity %}bg-[#FF8C00]{% endif %}" onclick="toggleColor(event, this, 'color_identity', 'C')" data-color="C">
-                                    <img src="https://svgs.scryfall.io/card-symbols/c.svg" alt="Colorless" class="w-5 h-5">
+                                    {{ mana_symbol('c')|raw }}
                                     <span class="text-sm text-zinc-200 font-['Space_Grotesk'] {% if 'C' in filters.colorIdentity %}text-black font-bold{% endif %}">Colorless</span>
                                 </button>
                             </div>
