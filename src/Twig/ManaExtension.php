@@ -26,12 +26,11 @@ class ManaExtension extends AbstractExtension
 
     public function replaceManaSymbols(string $text): string
     {
-        // Esta expresión regular busca cualquier texto encerrado entre llaves, ej: {T}, {U}, {10}, {B/G}
         return preg_replace_callback('/\{([^}]+)\}/', function($matches) {
-            // Scryfall almacena los símbolos partidos limpios sin barras oblicuas (ej: {B/G} pasa a bg.svg)
-            $symbolName = strtolower(str_replace('/', '', $matches[1]));
+            // Scryfall usa mayúsculas: W, U, B, R, G, C, y también números y símbolos
+            // Para híbridos, quitar la barra: {2/G} → 2G, {B/R} → BR
+            $symbolName = strtoupper(str_replace('/', '', $matches[1]));
             
-            // Retornamos el HTML apuntando directamente al CDN de SVGs de Scryfall
             return sprintf(
                 '<img src="https://svgs.scryfall.io/card-symbols/%s.svg" class="mana-symbol" alt="%s" title="%s">',
                 $symbolName,
@@ -43,7 +42,7 @@ class ManaExtension extends AbstractExtension
 
     public function getManaSymbol(string $symbol, string $alt = ''): string
     {
-        $symbolName = strtolower($symbol);
+        $symbolName = strtoupper($symbol);
         if (empty($alt)) {
             $alt = $symbol;
         }

@@ -215,7 +215,7 @@
     function replaceManaSymbols(text) {
         if (!text) return '';
         return text.replace(/\{([^}]+)\}/g, function(match, symbol) {
-            const symbolName = symbol.replace(/\//g, '');
+            const symbolName = symbol.replace(/\//g, '').toUpperCase();
             return `<img src="https://svgs.scryfall.io/card-symbols/${symbolName}.svg" class="mana-symbol" alt="${match}" title="${match}">`;
         });
     }
