@@ -196,12 +196,12 @@
             <!-- Results Count -->
             <div class="mb-6">
                 <p class="text-zinc-300 text-base font-['Space_Grotesk']">
-                    Found <span class="text-[#FF8C00] font-bold text-lg">{{ cards|length }}</span> cards
+                    Found <span class="text-[#FF8C00] font-bold text-lg">{{ cards|length }}</span> cards (Page <span class="text-[#FF8C00] font-bold">{{ current_page }}</span> of {{ ((total_cards - 1) // 175) + 1 }})
                 </p>
             </div>
 
             <!-- Cards Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pb-24">
                 {% for card in cards %}
                     <a href="{{ path('app_card_view', {id: card.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded overflow-hidden group">
                         <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900 rounded-[0.75rem]">
@@ -219,6 +219,39 @@
                         </div>
                     </a>
                 {% endfor %}
+            </div>
+
+            <!-- Sticky Pagination Controls -->
+            <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#121212] via-[#121212] to-transparent py-10 z-40">
+                <div class="max-w-[1440px] mx-auto px-8 lg:px-12 flex items-center justify-center gap-6">
+                    {% if current_page > 1 %}
+                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, page: current_page - 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
+                            <span class="material-symbols-outlined">navigate_before</span>
+                            Previous
+                        </a>
+                    {% else %}
+                        <button disabled class="flex items-center gap-2 bg-zinc-700 text-zinc-400 px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider cursor-not-allowed opacity-50">
+                            <span class="material-symbols-outlined">navigate_before</span>
+                            Previous
+                        </button>
+                    {% endif %}
+
+                    <span class="text-zinc-300 font-['Space_Grotesk'] text-sm font-semibold whitespace-nowrap">
+                        Page <span class="text-[#FF8C00]">{{ current_page }}</span>
+                    </span>
+
+                    {% if has_more %}
+                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, page: current_page + 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
+                            Next
+                            <span class="material-symbols-outlined">navigate_next</span>
+                        </a>
+                    {% else %}
+                        <button disabled class="flex items-center gap-2 bg-zinc-700 text-zinc-400 px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider cursor-not-allowed opacity-50">
+                            Next
+                            <span class="material-symbols-outlined">navigate_next</span>
+                        </button>
+                    {% endif %}
+                </div>
             </div>
 
         {% elseif query or filters.types|length > 0 or filters.rarity or filters.format %}

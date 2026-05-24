@@ -282,17 +282,22 @@ class ScryfallService
     }
 
     /**
-     * Search cards by name - returns multiple results
+     * Search cards by name - returns multiple results with pagination
      */
-    public function searchCards(string $query): array
+    public function searchCards(string $query, int $page = 1): array
     {
         if (strlen($query) < 2) {
-            return [];
+            return [
+                'data' => [],
+                'total_cards' => 0,
+                'has_more' => false,
+                'current_page' => $page,
+            ];
         }
 
         try {
             $response = $this->httpClient->request('GET', self::SCRYFALL_API . '/cards/search', [
-                'query' => ['q' => $query, 'order' => 'name'],
+                'query' => ['q' => $query, 'order' => 'name', 'page' => $page],
                 'headers' => [
                     'User-Agent' => self::USER_AGENT,
                     'Accept' => 'application/json',
@@ -300,13 +305,28 @@ class ScryfallService
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                return [];
+                return [
+                    'data' => [],
+                    'total_cards' => 0,
+                    'has_more' => false,
+                    'current_page' => $page,
+                ];
             }
 
             $data = $response->toArray();
-            return $data['data'] ?? [];
+            return [
+                'data' => $data['data'] ?? [],
+                'total_cards' => $data['total_cards'] ?? 0,
+                'has_more' => $data['has_more'] ?? false,
+                'current_page' => $page,
+            ];
         } catch (\Exception $e) {
-            return [];
+            return [
+                'data' => [],
+                'total_cards' => 0,
+                'has_more' => false,
+                'current_page' => $page,
+            ];
         }
     }
 

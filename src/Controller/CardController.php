@@ -59,6 +59,7 @@ class CardController extends AbstractController
     public function search(Request $request): Response
     {
         $query = $request->query->get('q', '');
+        $page = $request->query->getInt('page', 1);
         $filters = [
             'types' => $request->query->all('types') ?? [],
             'rarity' => $request->query->get('rarity', ''),
@@ -71,13 +72,19 @@ class CardController extends AbstractController
         ];
         
         $cards = [];
+        $totalCards = 0;
+        $hasMore = false;
         $searchQuery = $this->buildSearchQuery($query, $filters);
 
         if (strlen($searchQuery) >= 2) {
-            $results = $this->scryfallService->searchCards($searchQuery);
+            $results = $this->scryfallService->searchCards($searchQuery, $page);
+            
+            $totalCards = $results['total_cards'] ?? 0;
+            $hasMore = $results['has_more'] ?? false;
+            $cardsData = $results['data'] ?? [];
             
             // Format cards for display
-            foreach ($results as $cardData) {
+            foreach ($cardsData as $cardData) {
                 $imageUrl = '';
                 if (isset($cardData['image_uris']['normal'])) {
                     $imageUrl = $cardData['image_uris']['normal'];
@@ -105,6 +112,9 @@ class CardController extends AbstractController
             'query' => $query,
             'cards' => $cards,
             'filters' => $filters,
+            'current_page' => $page,
+            'total_cards' => $totalCards,
+            'has_more' => $hasMore,
         ]);
     }
 
