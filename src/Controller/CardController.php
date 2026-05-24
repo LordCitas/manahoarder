@@ -69,6 +69,7 @@ class CardController extends AbstractController
             'cmc' => $request->query->get('cmc', ''),
             'artist' => $request->query->get('artist', ''),
             'set' => $request->query->get('set', ''),
+            'showDigital' => $request->query->has('show_digital'),
         ];
         
         $cards = [];
@@ -164,6 +165,11 @@ class CardController extends AbstractController
         
         if (!empty($filters['set'])) {
             $parts[] = 'e:' . $filters['set'];
+        }
+        
+        // By default, exclude digital-only cards unless explicitly included
+        if (!isset($filters['showDigital']) || !$filters['showDigital']) {
+            $parts[] = '-is:digital';
         }
         
         return implode(' ', $parts);

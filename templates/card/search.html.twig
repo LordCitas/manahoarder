@@ -220,6 +220,20 @@
                             <div id="colorIdentityContainer"></div>
                         </div>
 
+                        <!-- Show Digital Cards -->
+                        <div>
+                            <label class="flex items-center gap-3 cursor-pointer bg-[#121212] border border-[#2A2A2A] py-3 px-3 rounded hover:border-[#FF8C00]/50 transition-all">
+                                <input 
+                                    type="checkbox" 
+                                    name="show_digital"
+                                    value="1"
+                                    {% if filters.showDigital %}checked{% endif %}
+                                    class="w-5 h-5 rounded bg-[#1a1a1a] border border-[#FF8C00] cursor-pointer accent-[#FF8C00]"
+                                >
+                                <span class="text-sm text-zinc-200 font-['Space_Grotesk'] font-semibold uppercase tracking-wider">Show Digital-Only Cards</span>
+                            </label>
+                        </div>
+
                     </div>
 
                     <!-- Filter Actions -->
@@ -269,7 +283,7 @@
             <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#121212] via-[#121212] to-transparent py-10 z-40">
                 <div class="max-w-[1440px] mx-auto px-8 lg:px-12 flex items-center justify-center gap-6">
                     {% if current_page > 1 %}
-                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, page: current_page - 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
+                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, show_digital: filters.showDigital ? 1 : null, page: current_page - 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
                             <span class="material-symbols-outlined">navigate_before</span>
                             Previous
                         </a>
@@ -285,7 +299,7 @@
                     </span>
 
                     {% if has_more %}
-                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, page: current_page + 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
+                        <a href="{{ path('app_card_search', { q: query, types: filters.types, rarity: filters.rarity, colors: filters.colors, color_identity: filters.colorIdentity, format: filters.format, cmc: filters.cmc, artist: filters.artist, set: filters.set, show_digital: filters.showDigital ? 1 : null, page: current_page + 1 }) }}" class="flex items-center gap-2 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all hover:shadow-lg">
                             Next
                             <span class="material-symbols-outlined">navigate_next</span>
                         </a>
@@ -314,47 +328,68 @@
 </main>
 
 <script>
-    // Toggle advanced filters
-    const toggleBtn = document.getElementById('toggleFilters');
-    const filtersPanel = document.getElementById('advancedFilters');
-    const filterIcon = document.getElementById('filterIcon');
-
-    toggleBtn.addEventListener('click', function() {
-        filtersPanel.classList.toggle('hidden');
-        filterIcon.textContent = filtersPanel.classList.contains('hidden') ? 'expand_more' : 'expand_less';
-    });
-
-    // Auto-expand if filters are active
-    {% if filters.types|length > 0 or filters.rarity or filters.format or filters.cmc or filters.artist or filters.set or filters.colors|length > 0 or filters.colorIdentity|length > 0 %}
-        filtersPanel.classList.remove('hidden');
-        filterIcon.textContent = 'expand_less';
-    {% endif %}
-
-    // Initialize color containers with existing filters
-    const colorsContainer = document.getElementById('colorsContainer');
-    const colorIdentityContainer = document.getElementById('colorIdentityContainer');
+    // Setup toggle with proper event handling
+    function setupToggleButton() {
+        const toggleBtn = document.getElementById('toggleFilters');
+        const filtersPanel = document.getElementById('advancedFilters');
+        const filterIcon = document.getElementById('filterIcon');
+        
+        if (!toggleBtn || !filtersPanel || !filterIcon) return;
+        
+        // Remove any existing listeners
+        const newToggleBtn = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+        
+        const freshToggleBtn = document.getElementById('toggleFilters');
+        freshToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            filtersPanel.classList.toggle('hidden');
+            filterIcon.textContent = filtersPanel.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+        });
+    }
     
-    // Add existing color filters to container
-    {% for color in filters.colors %}
-        const colorInput = document.createElement('input');
-        colorInput.type = 'hidden';
-        colorInput.name = 'colors[]';
-        colorInput.value = '{{ color }}';
-        colorsContainer.appendChild(colorInput);
-    {% endfor %}
-    
-    // Add existing color identity filters to container
-    {% for color in filters.colorIdentity %}
-        const colorIdInput = document.createElement('input');
-        colorIdInput.type = 'hidden';
-        colorIdInput.name = 'color_identity[]';
-        colorIdInput.value = '{{ color }}';
-        colorIdentityContainer.appendChild(colorIdInput);
-    {% endfor %}
+    // Initialize filters on page load
+    function initializeFilters() {
+        const filtersPanel = document.getElementById('advancedFilters');
+        const filterIcon = document.getElementById('filterIcon');
+        const colorsContainer = document.getElementById('colorsContainer');
+        const colorIdentityContainer = document.getElementById('colorIdentityContainer');
+        
+        if (!filtersPanel || !filterIcon) return;
+        
+        // Auto-expand if filters are active
+        {% if filters.types|length > 0 or filters.rarity or filters.format or filters.cmc or filters.artist or filters.set or filters.colors|length > 0 or filters.colorIdentity|length > 0 or filters.showDigital %}
+            filtersPanel.classList.remove('hidden');
+            filterIcon.textContent = 'expand_less';
+        {% endif %}
+        
+        // Add existing color filters to container
+        {% for color in filters.colors %}
+            const colorInput = document.createElement('input');
+            colorInput.type = 'hidden';
+            colorInput.name = 'colors[]';
+            colorInput.value = '{{ color }}';
+            colorsContainer.appendChild(colorInput);
+        {% endfor %}
+        
+        // Add existing color identity filters to container
+        {% for color in filters.colorIdentity %}
+            const colorIdInput = document.createElement('input');
+            colorIdInput.type = 'hidden';
+            colorIdInput.name = 'color_identity[]';
+            colorIdInput.value = '{{ color }}';
+            colorIdentityContainer.appendChild(colorIdInput);
+        {% endfor %}
+        
+        // Setup the toggle button
+        setupToggleButton();
+    }
 
     // Toggle color selection function
     function toggleColor(event, button, fieldName, colorCode) {
         event.preventDefault();
+        event.stopPropagation();
         
         const isSelected = button.classList.contains('bg-[#FF8C00]');
         const containerName = fieldName === 'colors' ? 'colorsContainer' : 'colorIdentityContainer';
@@ -439,6 +474,10 @@
             });
         });
         document.getElementById('colorIdentityContainer').innerHTML = '';
+        
+        // Uncheck show digital checkbox
+        const showDigitalCheckbox = document.querySelector('input[name="show_digital"]');
+        if (showDigitalCheckbox) showDigitalCheckbox.checked = false;
     }
 
     // Card Type Multi-Select
@@ -595,5 +634,12 @@
             setSuggestions.classList.add('hidden');
         }
     });
+
+    // Initialize filters when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeFilters);
+    } else {
+        initializeFilters();
+    }
 </script>
 {% endblock %}

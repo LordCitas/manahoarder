@@ -1,0 +1,323 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Deck - ManaHoarder{% endblock %}
+
+{% block body %}
+<main class="min-h-screen">
+    <div id="mainContainer" class="max-w-[1600px] mx-auto p-8 lg:p-12">
+        <!-- Header Section -->
+        <div class="mb-10">
+            <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">Create Deck</h1>
+            <p class="text-zinc-300 text-lg">Search for cards and add them to your deck</p>
+        </div>
+
+        <!-- Format Selection (Required) -->
+        <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl p-6 mb-6">
+            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-3">Select Format</label>
+            <select id="deckFormat" class="w-full max-w-xs bg-[#121212] border border-[#2A2A2A] py-3 px-4 text-base text-zinc-200 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded">
+                <option value="">Choose a format...</option>
+                <option value="standard">Standard</option>
+                <option value="modern">Modern</option>
+                <option value="commander">Commander</option>
+                <option value="legacy">Legacy</option>
+                <option value="vintage">Vintage</option>
+                <option value="pioneer">Pioneer</option>
+                <option value="pauper">Pauper</option>
+            </select>
+            <p class="text-xs text-zinc-400 mt-2">You must select a format before adding cards</p>
+        </div>
+
+        <div id="deckContent" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Panel - Search -->
+            <div id="searchPanel" class="lg:col-span-2">
+                <!-- Card Search -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl p-6 mb-6">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk'] mb-3">Search Cards</label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">search</span>
+                        <input 
+                            type="text" 
+                            id="cardSearch"
+                            placeholder="Search by card name..." 
+                            class="w-full bg-[#121212] border border-[#2A2A2A] py-4 pl-12 pr-3 text-base text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                        >
+                    </div>
+                </div>
+
+                <!-- Columns Selector -->
+                <div class="flex items-center gap-3 mb-4">
+                    <label class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk']">Cards per row:</label>
+                    <select id="columnsSelector" class="bg-[#121212] border border-[#2A2A2A] py-2 px-3 text-sm text-zinc-200 font-['Space_Grotesk'] focus:border-[#FF8C00] outline-none rounded">
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+
+                <!-- Search Results -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl overflow-hidden">
+                    <div class="p-6 border-b border-[#2A2A2A]">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk']">Search Results</h2>
+                    </div>
+                    
+                    <div id="searchResults" class="grid gap-4 p-6 max-h-[600px] overflow-y-auto" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+                        <p class="col-span-full text-zinc-400 text-center py-8">Start typing to search for cards...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Deck Cards -->
+            <div id="deckSidebar">
+                <!-- View Toggle -->
+                <div class="flex gap-2 mb-4">
+                    <button id="viewListBtn" class="flex-1 bg-[#FF8C00] text-black px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">list</span>
+                        List
+                    </button>
+                    <button id="viewGridBtn" class="flex-1 bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">grid_view</span>
+                        Grid
+                    </button>
+                </div>
+
+                <!-- Deck Stats -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl p-4 mb-4">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-zinc-400">Total Cards:</span>
+                            <span class="text-[#FF8C00] font-bold" id="deckTotal">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-400">Unique Cards:</span>
+                            <span class="text-[#FF8C00] font-bold" id="deckUnique">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-400">Avg Mana Cost:</span>
+                            <span class="text-[#FF8C00] font-bold" id="deckCMC">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deck Cards List View -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl overflow-hidden" id="deckListContainer">
+                    <div class="p-4 border-b border-[#2A2A2A]">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk']">Deck Cards</h3>
+                    </div>
+                    <div id="deckCardsList" class="max-h-[400px] overflow-y-auto">
+                        <p class="text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>
+                    </div>
+                </div>
+
+                <!-- Deck Cards Grid View (full width) -->
+                <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl p-4 hidden" id="deckGridContainer">
+                    <div id="deckCardsGrid" class="grid grid-cols-4 gap-3">
+                        <p class="col-span-full text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>
+                    </div>
+                </div>
+
+                <!-- Save Deck Button -->
+                <button class="w-full bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all mt-4 flex items-center justify-center gap-2 hover:shadow-lg">
+                    <span class="material-symbols-outlined">save</span>
+                    Save Deck
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Deck management
+    let deckCards = {};
+    let currentView = 'list';
+    let selectedFormat = null;
+    const deckFormatSelect = document.getElementById('deckFormat');
+    const deckContent = document.getElementById('deckContent');
+    const searchPanel = document.getElementById('searchPanel');
+    const deckSidebar = document.getElementById('deckSidebar');
+    const cardSearch = document.getElementById('cardSearch');
+    const columnsSelector = document.getElementById('columnsSelector');
+    const searchResults = document.getElementById('searchResults');
+    const deckCardsList = document.getElementById('deckCardsList');
+    const deckCardsGrid = document.getElementById('deckCardsGrid');
+    const deckListContainer = document.getElementById('deckListContainer');
+    const deckGridContainer = document.getElementById('deckGridContainer');
+    const viewListBtn = document.getElementById('viewListBtn');
+    const viewGridBtn = document.getElementById('viewGridBtn');
+    const mainContainer = document.getElementById('mainContainer');
+    
+    let searchTimeout;
+
+    // Format selection handler
+    deckFormatSelect.addEventListener('change', function(e) {
+        selectedFormat = e.target.value;
+        if (selectedFormat) {
+            deckContent.classList.remove('hidden');
+        } else {
+            deckContent.classList.add('hidden');
+            deckCards = {};
+            updateDeckDisplay();
+        }
+    });
+
+    // Update grid columns
+    columnsSelector.addEventListener('change', function(e) {
+        const cols = e.target.value;
+        searchResults.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+        deckCardsGrid.className = `grid gap-3`;
+        deckCardsGrid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    });
+
+    // Search cards with debounce
+    cardSearch.addEventListener('input', function(e) {
+        if (!selectedFormat) return;
+        
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+
+        if (query.length < 2) {
+            searchResults.innerHTML = '<p class="col-span-full text-zinc-400 text-center py-8">Start typing to search for cards...</p>';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`{{ path('app_deck_search_cards') }}?q=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Search failed');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        searchResults.innerHTML = `<p class="col-span-full text-red-400 text-center py-8">${data.error}</p>`;
+                        return;
+                    }
+
+                    if (data.cards.length === 0) {
+                        searchResults.innerHTML = '<p class="col-span-full text-zinc-400 text-center py-8">No cards found</p>';
+                        return;
+                    }
+
+                    searchResults.innerHTML = data.cards.map(card => `
+                        <div class="bg-[#121212] border border-[#2A2A2A] rounded-lg overflow-hidden hover:border-[#FF8C00]/50 transition-all cursor-pointer group" onclick="addCardToDeck('${card.id}', '${card.name.replace(/'/g, "\\'")}', '${card.image.replace(/'/g, "\\'")}', '${card.mana_cost.replace(/'/g, "\\'")}')">
+                            <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900">
+                                <img alt="${card.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${card.image}"/>
+                            </div>
+                            <div class="p-2">
+                                <h4 class="font-['Space_Grotesk'] text-xs font-semibold text-white line-clamp-2">${card.name}</h4>
+                                <p class="text-xs text-zinc-400 uppercase">${card.mana_cost}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    searchResults.innerHTML = '<p class="col-span-full text-red-400 text-center py-8">Error searching cards</p>';
+                });
+        }, 300);
+    });
+
+    // Add card to deck
+    function addCardToDeck(id, name, image, manaCost) {
+        if (!selectedFormat) {
+            alert('Please select a format first');
+            return;
+        }
+        
+        if (!deckCards[id]) {
+            deckCards[id] = {
+                name: name,
+                image: image,
+                manaCost: manaCost,
+                count: 0
+            };
+        }
+        deckCards[id].count++;
+        updateDeckDisplay();
+    }
+
+    // Remove card from deck
+    function removeCardFromDeck(id) {
+        if (deckCards[id]) {
+            deckCards[id].count--;
+            if (deckCards[id].count <= 0) {
+                delete deckCards[id];
+            }
+            updateDeckDisplay();
+        }
+    }
+
+    // Update deck display
+    function updateDeckDisplay() {
+        const cards = Object.entries(deckCards);
+        const totalCards = cards.reduce((sum, [_, card]) => sum + card.count, 0);
+        const uniqueCards = cards.length;
+
+        // Update stats
+        document.getElementById('deckTotal').textContent = totalCards;
+        document.getElementById('deckUnique').textContent = uniqueCards;
+
+        // Update list view
+        if (cards.length === 0) {
+            deckCardsList.innerHTML = '<p class="text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>';
+            deckCardsGrid.innerHTML = '<p class="col-span-full text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>';
+        } else {
+            deckCardsList.innerHTML = cards.map(([id, card]) => `
+                <div class="flex items-center justify-between p-3 border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
+                    <div class="flex-1">
+                        <h4 class="font-['Space_Grotesk'] text-sm font-semibold text-white">${card.name}</h4>
+                        <p class="text-xs text-zinc-400">${card.manaCost}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="removeCardFromDeck('${id}')" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-2 py-1 rounded text-xs transition-colors">−</button>
+                        <span class="text-[#FF8C00] font-bold w-6 text-center">${card.count}</span>
+                        <button onclick="addCardToDeck('${id}', '${card.name.replace(/'/g, "\\'")}', '${card.image.replace(/'/g, "\\'")}', '${card.manaCost.replace(/'/g, "\\'")}')" class="bg-green-600/20 hover:bg-green-600/40 text-green-400 px-2 py-1 rounded text-xs transition-colors">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const cols = columnsSelector.value;
+            deckCardsGrid.innerHTML = cards.flatMap(([id, card]) => {
+                const copies = [];
+                for (let i = 0; i < card.count; i++) {
+                    copies.push(`
+                        <div class="relative group cursor-pointer" onclick="removeCardFromDeck('${id}')">
+                            <img alt="${card.name}" class="w-full rounded-lg border border-[#2A2A2A] group-hover:border-red-600/50 transition-colors" src="${card.image}"/>
+                            <div class="absolute top-1 right-1 bg-red-600 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">Remove</div>
+                        </div>
+                    `);
+                }
+                return copies;
+            }).join('');
+        }
+    }
+
+    // View toggle
+    viewListBtn.addEventListener('click', function() {
+        currentView = 'list';
+        deckListContainer.classList.remove('hidden');
+        deckGridContainer.classList.add('hidden');
+        searchPanel.classList.remove('lg:col-span-3');
+        searchPanel.classList.add('lg:col-span-2');
+        deckSidebar.classList.remove('hidden');
+        viewListBtn.classList.add('bg-[#FF8C00]');
+        viewListBtn.classList.remove('bg-zinc-900', 'border', 'text-zinc-300');
+        viewGridBtn.classList.remove('bg-[#FF8C00]');
+        viewGridBtn.classList.add('bg-zinc-900', 'border', 'text-zinc-300');
+        mainContainer.querySelector('#mainContainer > div:last-of-type').parentElement.style.gridTemplateColumns = '';
+    });
+
+    viewGridBtn.addEventListener('click', function() {
+        currentView = 'grid';
+        deckListContainer.classList.add('hidden');
+        deckGridContainer.classList.remove('hidden');
+        searchPanel.classList.add('lg:col-span-3');
+        searchPanel.classList.remove('lg:col-span-2');
+        deckSidebar.classList.add('hidden');
+        viewGridBtn.classList.add('bg-[#FF8C00]');
+        viewGridBtn.classList.remove('bg-zinc-900', 'border', 'text-zinc-300');
+        viewListBtn.classList.remove('bg-[#FF8C00]');
+        viewListBtn.classList.add('bg-zinc-900', 'border', 'text-zinc-300');
+    });
+</script>
+{% endblock %}

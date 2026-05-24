@@ -4,9 +4,32 @@
 
 {% block body %}
 <main class="min-h-screen">
-    <div class="p-6">
-        <h1 class="text-2xl font-bold text-primary">Your Decks</h1>
-        <p class="text-on-surface-variant mt-2">Manage and organize your Magic decks</p>
+    <div class="max-w-[1440px] mx-auto p-8 lg:p-12">
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-10">
+            <div>
+                <h1 class="font-['Space_Grotesk'] text-[40px] leading-[1.2] tracking-tighter font-bold text-[#FF8C00] mb-2 uppercase">Your Decks</h1>
+                <p class="text-zinc-300 text-lg">Manage and organize your Magic decks</p>
+            </div>
+            <a href="{{ path('app_deck_create') }}" class="bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all flex items-center gap-2 hover:shadow-lg">
+                <span class="material-symbols-outlined">add</span>
+                Create New Deck
+            </a>
+        </div>
+
+        <!-- Empty State -->
+        <div class="flex items-center justify-center min-h-[50vh]">
+            <div class="text-center max-w-md">
+                <div class="w-24 h-24 rounded-full bg-zinc-900 border border-[#2A2A2A] flex items-center justify-center mx-auto mb-6">
+                    <span class="material-symbols-outlined text-5xl text-zinc-600">style</span>
+                </div>
+                <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white mb-3 uppercase tracking-tight">No Decks Yet</h2>
+                <p class="text-zinc-300 text-base mb-8">Start creating your first deck to begin building your collection!</p>
+                <a href="{{ path('app_deck_create') }}" class="inline-block bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all">
+                    Create Your First Deck
+                </a>
+            </div>
+        </div>
     </div>
 </main>
 {% endblock %}
