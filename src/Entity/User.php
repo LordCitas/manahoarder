@@ -49,18 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     /**
-     * @var Collection<int, UserCard>
-     */
-    #[ORM\OneToMany(targetEntity: UserCard::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $userCards;
-
-    /**
-     * @var Collection<int, Album>
-     */
-    #[ORM\OneToMany(targetEntity: Album::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $albums;
-
-    /**
      * @var Collection<int, Decklist>
      */
     #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'user', orphanRemoval: true)]
@@ -83,8 +71,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->userCards = new ArrayCollection();
-        $this->albums = new ArrayCollection();
         $this->decklists = new ArrayCollection();
         $this->tournamentParticipants = new ArrayCollection();
         $this->tournaments = new ArrayCollection();
@@ -199,66 +185,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
 
         return $data;
-    }
-
-    /**
-     * @return Collection<int, UserCard>
-     */
-    public function getUserCards(): Collection
-    {
-        return $this->userCards;
-    }
-
-    public function addUserCard(UserCard $userCard): static
-    {
-        if (!$this->userCards->contains($userCard)) {
-            $this->userCards->add($userCard);
-            $userCard->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserCard(UserCard $userCard): static
-    {
-        if ($this->userCards->removeElement($userCard)) {
-            // set the owning side to null (unless already changed)
-            if ($userCard->getUser() === $this) {
-                $userCard->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Album>
-     */
-    public function getAlbums(): Collection
-    {
-        return $this->albums;
-    }
-
-    public function addAlbum(Album $album): static
-    {
-        if (!$this->albums->contains($album)) {
-            $this->albums->add($album);
-            $album->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAlbum(Album $album): static
-    {
-        if ($this->albums->removeElement($album)) {
-            // set the owning side to null (unless already changed)
-            if ($album->getUser() === $this) {
-                $album->setUser(null);
-            }
-        }
-
-        return $this;
     }
 
     /**

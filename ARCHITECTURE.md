@@ -1,98 +1,84 @@
 # 🏛️ Arquitectura de Base de Datos - ManaHoarder
 
-## Estrategia: Base de Datos + Caché Perezosa (Lazy Cache)
+## Entidades Principales
 
-### Problema Original
-❌ **LocalStorage no es viable porque:**
-- Límite de 5MB por navegador
-- Se pierde si el usuario borra cookies/historial
-- No funciona cross-device (móvil, tablet, PC)
-- No hay estadísticas globales
+### 1️⃣ **User** (Usuarios del sistema)
+**Función:** Gestión de cuentas y perfiles  
+**Almacena:**
+- `email` (único, para autenticación)
+- `nickname` (apodo único del usuario)
+- `password` (hasheada con bcrypt)
+- `profilePictureFilename` (foto de perfil)
+- `profileArtUrl` (URL de arte de fondo)
+- `roles` (array: ROLE_USER, ROLE_ADMIN)
+- `createdAt` (fecha de creación)
+
+**Relaciones:**
+- `OneToMany` con `Decklist` (un usuario tiene muchos mazos)
+- `OneToMany` con `TournamentParticipant` (participación en torneos)
+- `OneToMany` con `Tournament` (torneos creados como organizador)
 
 ---
 
-## ✅ Solución Implementada
+### 2️⃣ **Decklist** (Mazos del usuario)
+**Función:** Almacenar mazos de Magic: The Gathering  
+**Almacena:**
+- `name` (nombre del mazo)
+- `format` (formato: Modern, Standard, Commander, etc.)
+- `description` (descripción opcional)
+- `user_id` (FK a User, creador del mazo)
+- `createdAt` (fecha de creación)
 
-### 1️⃣ **Tabla `ScryfallCard`** (Mini-espejo de Scryfall)
-**Función:** Cache de datos de cartas desde Scryfall  
+**Relaciones:**
+- `ManyToOne` con `User` (pertenece a un usuario)
+- `OneToMany` con `TournamentParticipant` (puede usarse en torneos)
+
+---
+
+### 3️⃣ **Tournament** (Torneos)
+**Función:** Crear y gestionar torneos de Magic  
+**Almacena:**
+- `name` (nombre del torneo)
+- `description` (descripción opcional)
+- `format` (formato del torneo)
+- `state` (estado: pending, in_progress, completed)
+- `maxPlayers` (número máximo de participantes)
+- `creator_id` (FK a User, quien crea el torneo)
+- `createdAt` y `updatedAt` (timestamps)
+
+**Relaciones:**
+- `OneToMany` con `TournamentParticipant` (lista de participantes)
+- `ManyToOne` con `User` (creador del torneo)
+
+---
+
+### 4️⃣ **TournamentParticipant** (Participantes en torneos)
+**Función:** Relación entre Usuarios y Torneos  
+**Almacena:**
+- `user_id` (FK a User)
+- `tournament_id` (FK a Tournament)
+- `decklist_id` (FK a Decklist, mazo utilizado)
+- `playerStatus` (estado del jugador)
+- `createdAt` (fecha de inscripción)
+
+**Relaciones:**
+- `ManyToOne` con `User`
+- `ManyToOne` con `Tournament`
+- `ManyToOne` con `Decklist`
+
+---
+
+### 5️⃣ **ScryfallCard** (Caché de datos de Scryfall)
+**Función:** Cache perezosa de cartas desde la API de Scryfall  
 **Almacena:**
 - `scryfallId` (UUID único de Scryfall)
 - `name` (nombre de la carta)
 - `manaCost` (coste de maná)
 - `imageUrl` (URL de la imagen)
-- `type` (tipo de carta: Creature, Sorcery, etc.)
+- `type` (tipo de carta)
 - `cardText` (texto de la carta nullable)
 - `cardSet` (set al que pertenece)
-- `createdAt` (timestamp de cuándo se cacheó)
-
-**Tamaño esperado:** ~500 bytes por carta cacheada  
-**Ventaja:** SQLite ocupa muy poco espacio
-
----
-
-### 2️⃣ **Tabla `UserCard`** (Colección del usuario)
-**Función:** Relación entre Usuario → Carta cacheada  
-**Almacena:**
-- `user_id` (FK a User)
-- `scryfallCard_id` (FK a ScryfallCard)
-- `quantity` (cantidad de copias: 1, 2, 3, 4)
-- `isFoil` (¿está brillante?)
-- `dateAdded` (cuándo el usuario la agregó)
-- `album_id` (a qué álbum pertenece)
-
-**Relaciones:**
-- `ManyToOne` con `User` (un usuario tiene muchas UserCard)
-- `ManyToOne` con `ScryfallCard` (muchos usuarios pueden tener la misma carta)
-- `ManyToOne` con `Album` (las cartas se organizan en álbumes)
-
----
-
-### 3️⃣ **Tabla `Album`** (Organización de colecciones)
-**Función:** Agrupar cartas del usuario por tema/propósito  
-**Almacena:**
-- `title` (nombre del álbum: "Mi Mazo Rojo", "Cartas de Coleccionista")
-- `description` (descripción opcional)
-- `user_id` (FK a User)
-- `createdAt` (cuándo se creó)
-
-**Ejemplo de uso:**
-```
-Usuario → [Álbum "Mazo Estándar"] → [UserCard (Goblin, qty=2, foil=true)]
-                                  → [UserCard (Lava Spike, qty=3, foil=false)]
-                                  → ...
-
-Usuario → [Álbum "Cartas Raras"] → [UserCard (Black Lotus, qty=1, foil=true)]
-```
-
----
-
-## 🔄 Flujo de Funcionamiento
-
-### Escenario: Usuario abre su álbum "Mazo Rojo"
-
-```
-┌─ Usuario abre álbum "Mazo Rojo"
-│
-├─ Backend busca: SELECT * FROM user_card WHERE album_id = ? AND user_id = ?
-│
-├─ Para cada UserCard, obtiene la carta con:
-│  SELECT * FROM scryfall_card WHERE id = scryfallCard_id
-│
-├─ ¿La carta está en ScryfallCard?
-│  ├─ SÍ  → Devuelve instantáneamente (base de datos local)
-│  └─ NO  → Llama API Scryfall → Cachea en ScryfallCard
-│
-└─ Frontend renderiza las 100 cartas en < 200ms
-```
-
-### Ventajas:
-
-✅ **Velocidad:** La 2ª vez que alguien abre una carta, es instantáneo  
-✅ **Rate Limit:** No saturamos la API de Scryfall  
-✅ **Multi-dispositivo:** El usuario ve su colección igual en PC, móvil, tablet  
-✅ **Estadísticas:** Podemos hacer queries globales (carta más usada, etc.)  
-✅ **Espacio mínimo:** SQLite ocupa < 10MB incluso con 5000 cartas  
-✅ **Offline-ready:** La caché permite ver cartas sin conexión
+- `createdAt` (timestamp de caché)
 
 ---
 
@@ -100,23 +86,26 @@ Usuario → [Álbum "Cartas Raras"] → [UserCard (Black Lotus, qty=1, foil=true
 
 ```
 User (1)
-  ├─ (1:M) → UserCard
-  │          ├─ (M:1) → ScryfallCard (caché Scryfall)
-  │          └─ (M:1) → Album
+  ├─ (1:M) → Decklist
+  │          └─ (1:M) → TournamentParticipant
+  │                      └─ (M:1) → Tournament
   │
-  └─ (1:M) → Album
+  ├─ (1:M) → TournamentParticipant (como jugador)
+  │
+  └─ (1:M) → Tournament (como creador)
 ```
 
 ---
 
-## 📊 Ejemplos de Queries Útiles
+## Integración con Scryfall API
 
-### Obtener todas las cartas de un álbum del usuario
+La API se utiliza para:
+- Búsqueda de cartas por nombre
+- Filtrado por formato legal (`legal:modern`, `legal:standard`, etc.)
+- Obtención de datos de cartas (costo de maná, tipo, texto, imagen)
+- Validación de legalidad de cartas en formatos específicos
 
-```php
-$album->getUserCards(); // Lazy load desde Doctrine
-// SELECT * FROM user_card WHERE album_id = ? AND user_id = ?
-```
+Los datos se cachean en `ScryfallCard` para optimizar consultas posteriores.
 
 ### Obtener datos de la carta (nombre, imagen, etc.)
 
