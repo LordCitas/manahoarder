@@ -12,3 +12,43 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3); /* Un sutil sombreado para darles relieve */
     border-radius: 50%; /* La mayoría son redondos, esto suaviza los bordes */
 }
+
+/* Capas base de los fondos */
+.bg-fullscreen-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -3; /* Se coloca al fondo del todo */
+    opacity: 0;
+    transition: opacity 3s ease-in-out; /* Controla los segundos que dura el fundido gradual */
+}
+
+/* Esta clase mantendrá visible la capa activa */
+.bg-fullscreen-layer.active {
+    opacity: 1;
+}
+
+/* Capa del filtro oscuro superpuesto */
+#bg-overlay-dark {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65); /* 0.65 es el nivel de oscuridad (puedes subirlo o bajarlo) */
+    z-index: -2; /* Se coloca justo por encima de las imágenes, pero por detrás del contenido */
+    pointer-events: none; /* Evita que bloquee los clics en los botones de la página */
+}
+
+/* Asegurar que el contenido de la web sea legible y se posicione sobre los fondos */
+body {
+    position: relative;
+    background-color: #121212; /* Color de seguridad por si tarda en cargar la primera foto */
+    color: #ffffff;
+    min-height: 100vh;
+}
