@@ -21,14 +21,22 @@ class DeckController extends AbstractController
     public function searchCards(Request $request, ScryfallService $scryfallService): JsonResponse
     {
         $query = $request->query->get('q', '');
+        $format = $request->query->get('format', '');
         $page = $request->query->getInt('page', 1);
 
         if (strlen($query) < 2) {
             return new JsonResponse(['error' => 'Query too short'], 400);
         }
 
+        // Build search query with format filter for legality
+        $searchQuery = $query;
+        if (!empty($format)) {
+            // Use legal: operator to filter only cards legal in the selected format
+            $searchQuery .= ' legal:' . $format;
+        }
+
         try {
-            $results = $scryfallService->searchCards($query, $page);
+            $results = $scryfallService->searchCards($searchQuery, $page);
             
             $cards = [];
             foreach ($results['data'] ?? [] as $cardData) {

@@ -16,10 +16,10 @@
                     <span class="material-symbols-outlined text-sm">upload_file</span>
                     Import Decklist
                 </button>
-                <button class="bg-[#FF8C00] text-black px-5 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-2">
+                <a href="{{ path('app_deck_create') }}" class="bg-[#FF8C00] text-black px-5 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">add</span>
                     Create New Deck
-                </button>
+                </a>
             </div>
         </div>
 
@@ -146,10 +146,10 @@
                     <p class="text-zinc-400 mb-8">Start building your deck arsenal. Create your first competitive deck or import an existing decklist to get started.</p>
                     
                     <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button class="bg-[#FF8C00] text-black px-6 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                        <a href="{{ path('app_deck_create') }}" class="bg-[#FF8C00] text-black px-6 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">add</span>
                             Create Your First Deck
-                        </button>
+                        </a>
                         <button class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined text-sm">upload_file</span>
                             Import Decklist

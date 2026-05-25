@@ -77,7 +77,19 @@ class CardController extends AbstractController
         $hasMore = false;
         $searchQuery = $this->buildSearchQuery($query, $filters);
 
-        if (strlen($searchQuery) >= 2) {
+        // Allow search if:
+        // 1. Query string has at least 2 chars, OR
+        // 2. There are active filters (format, rarity, colors, types, etc.)
+        $hasActiveFilters = !empty($filters['format']) 
+            || !empty($filters['rarity']) 
+            || !empty($filters['types']) 
+            || !empty($filters['colors']) 
+            || !empty($filters['colorIdentity']) 
+            || !empty($filters['cmc']) 
+            || !empty($filters['artist']) 
+            || !empty($filters['set']);
+
+        if (strlen($searchQuery) >= 2 || $hasActiveFilters) {
             $results = $this->scryfallService->searchCards($searchQuery, $page);
             
             $totalCards = $results['total_cards'] ?? 0;
@@ -151,8 +163,9 @@ class CardController extends AbstractController
             }
         }
         
+        // Format filter - use 'legal' syntax for explicit legality checking
         if (!empty($filters['format'])) {
-            $parts[] = 'f:' . $filters['format'];
+            $parts[] = 'legal:' . $filters['format'];
         }
         
         if (!empty($filters['cmc'])) {
@@ -170,6 +183,11 @@ class CardController extends AbstractController
         // By default, exclude digital-only cards unless explicitly included
         if (!isset($filters['showDigital']) || !$filters['showDigital']) {
             $parts[] = '-is:digital';
+        }
+        
+        // If there's no name but there are filters, add a base condition to ensure Scryfall processes filters correctly
+        if (empty($name) && count($parts) > 1) {
+            array_unshift($parts, '(is:card)');
         }
         
         return implode(' ', $parts);
