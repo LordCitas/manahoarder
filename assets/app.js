@@ -14,39 +14,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const layer1 = document.getElementById('bg-layer-1');
     const layer2 = document.getElementById('bg-layer-2');
     
-    // Verificamos que las capas existan en la página actual
     if (layer1 && layer2) {
-        // Leemos el atributo data-backgrounds que Twig rellenó y lo convertimos en un Array de JS
-        const images = JSON.parse(layer1.dataset.backgrounds || "[]");
+        try {
+            // Leemos el atributo de Twig
+            const rawData = layer1.getAttribute('data-backgrounds');
+            console.log("Datos brutos recibidos de Twig:", rawData); // <-- MENSAJE DE CONTROL 1
 
-        if (images.length === 0) return; // Si no hay imágenes, detenemos el script
+            const images = JSON.parse(rawData || "[]");
+            console.log("Array de imágenes procesado por JS:", images); // <-- MENSAJE DE CONTROL 2
 
-        let currentIndex = 0;
-        let isLayer1Active = true;
-
-        // Inicializamos la primera imagen en la capa 1 usando la ruta real de Symfony
-        layer1.style.backgroundImage = `url('${images[currentIndex]}')`;
-        layer1.classList.add('active');
-
-        // Función que realiza el intercambio suave
-        const changeBackground = () => {
-            currentIndex = (currentIndex + 1) % images.length;
-            const nextImageUrl = images[currentIndex];
-
-            if (isLayer1Active) {
-                layer2.style.backgroundImage = `url('${nextImageUrl}')`;
-                layer2.classList.add('active');
-                layer1.classList.remove('active');
-            } else {
-                layer1.style.backgroundImage = `url('${nextImageUrl}')`;
-                layer1.classList.add('active');
-                layer2.classList.remove('active');
+            if (images.length === 0) {
+                console.warn("Alerta: El array de imágenes está vacío.");
+                return;
             }
 
-            isLayer1Active = !isLayer1Active;
-        };
+            let currentIndex = 0;
+            let isLayer1Active = true;
 
-        // Cambiar de imagen cada 8 segundos
-        setInterval(changeBackground, 8000);
+            // Forzamos la carga del primer fondo de inmediato
+            console.log("Cargando primer fondo:", images[currentIndex]);
+            layer1.style.backgroundImage = `url('${images[currentIndex]}')`;
+            layer1.classList.add('active');
+
+            // Función de intercambio
+            const changeBackground = () => {
+                currentIndex = (currentIndex + 1) % images.length;
+                const nextImageUrl = images[currentIndex];
+                console.log("Cambiando fondo al índice:", currentIndex, nextImageUrl);
+
+                if (isLayer1Active) {
+                    layer2.style.backgroundImage = `url('${nextImageUrl}')`;
+                    layer2.classList.add('active');
+                    layer1.classList.remove('active');
+                } else {
+                    layer1.style.backgroundImage = `url('${nextImageUrl}')`;
+                    layer1.classList.add('active');
+                    layer2.classList.remove('active');
+                }
+
+                isLayer1Active = !isLayer1Active;
+            };
+
+            // Ejecutar cada 8 segundos
+            setInterval(changeBackground, 8000);
+
+        } catch (error) {
+            console.error("Error crítico procesando los fondos animados:", error);
+        }
+    } else {
+        console.error("No se encontraron las capas de fondo (#bg-layer-1 o #bg-layer-2) en el HTML.");
     }
 });

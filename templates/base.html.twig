@@ -75,6 +75,7 @@
         {% endblock %}
 
         {% block javascripts %}
+        {{ importmap('app') }}
         {% endblock %}
 
         {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
@@ -86,6 +87,7 @@
     </head>
     <body class="bg-[#0A0A0A] text-zinc-200">
         {% include 'partials/_navbar.html.twig' %}
+
         <div id="bg-layer-1" class="bg-fullscreen-layer" data-backgrounds="{{ [
             asset('images/blanco.png'),
             asset('images/azul.png'),
@@ -94,6 +96,7 @@
             asset('images/verde.png'),
             asset('images/incoloro.png')
         ]|json_encode }}"></div>
+
         <div id="bg-layer-2" class="bg-fullscreen-layer"></div>
         <div id="bg-overlay-dark"></div>
         
