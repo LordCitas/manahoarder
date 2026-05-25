@@ -43,15 +43,8 @@ class ScryfallCard
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    /**
-     * @var Collection<int, UserCard>
-     */
-    #[ORM\OneToMany(targetEntity: UserCard::class, mappedBy: 'scryfallCard')]
-    private Collection $userCards;
-
     public function __construct()
     {
-        $this->userCards = new ArrayCollection();
     }
 
     public function getId(): ?int

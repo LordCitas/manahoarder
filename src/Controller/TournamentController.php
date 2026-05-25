@@ -75,6 +75,7 @@ class TournamentController extends AbstractController
     public function joinByCode(Request $request): Response
     {
         $code = trim($request->request->get('code'));
+        $decklistId = (int) $request->request->get('decklist_id');
         $user = $this->getUser();
         
         $tournament = $this->tournamentRepository->findOneBy(['inviteCode' => $code]);
@@ -93,6 +94,26 @@ class TournamentController extends AbstractController
             return $this->redirectToRoute('app_tournament_view', ['id' => $tournament->getId()]);
         }
         
+        // Verify decklist belongs to user and matches format
+        $decklist = null;
+        if ($decklistId > 0) {
+            $decklist = $this->decklistRepository->find($decklistId);
+            if (!$decklist || $decklist->getUser()->getId() !== $user->getId()) {
+                $this->addFlash('error', 'Invalid decklist selection.');
+                return $this->redirectToRoute('app_tournament_view', ['id' => $tournament->getId()]);
+            }
+            
+            // Verify decklist format matches tournament format
+            if ($decklist->getFormat() !== $tournament->getFormat()) {
+                $this->addFlash('error', sprintf(
+                    'Decklist format (%s) does not match tournament format (%s).',
+                    $decklist->getFormat(),
+                    $tournament->getFormat()
+                ));
+                return $this->redirectToRoute('app_tournament_view', ['id' => $tournament->getId()]);
+            }
+        }
+        
         // Create participant record
         $participant = new TournamentParticipant();
         $participant->setTournament($tournament);
@@ -100,6 +121,9 @@ class TournamentController extends AbstractController
         $participant->setJoinedAt(new DateTimeImmutable());
         $participant->setWins(0);
         $participant->setLosses(0);
+        if ($decklist) {
+            $participant->setDecklist($decklist);
+        }
         
         $this->entityManager->persist($participant);
         $this->entityManager->flush();
@@ -127,8 +151,8 @@ class TournamentController extends AbstractController
         $participants = $this->participantRepository->findBy(['tournament' => $tournament]);
         usort($participants, fn($a, $b) => $b->getWins() - $a->getWins());
         
-        // Get user's decklists for submission form
-        $userDecklists = $this->decklistRepository->findBy(['user' => $user]);
+        // Get user's decklists matching tournament format for join form
+        $userDecklists = $this->decklistRepository->findBy(['user' => $user, 'format' => $tournament->getFormat()]);
         
         return $this->render('tournament/view.html.twig', [
             'tournament' => $tournament,
@@ -229,6 +253,61 @@ class TournamentController extends AbstractController
         $this->entityManager->flush();
         
         $this->addFlash('success', 'Tournament started!');
+        return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+    }
+
+    #[Route('/tournaments/{id}/remove-participant/{participantId}', name: 'app_tournament_remove_participant', methods: ['POST'])]
+    public function removeParticipant(int $id, int $participantId): Response
+    {
+        $tournament = $this->tournamentRepository->find($id);
+        if (!$tournament) {
+            throw $this->createNotFoundException('Tournament not found');
+        }
+        
+        $user = $this->getUser();
+        if ($tournament->getCreator()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Only the tournament creator can remove participants.');
+            return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+        }
+        
+        $participant = $this->participantRepository->find($participantId);
+        if (!$participant || $participant->getTournament()->getId() !== $id) {
+            $this->addFlash('error', 'Participant not found in this tournament.');
+            return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+        }
+        
+        $participantName = $participant->getUser()->getNickname();
+        $this->entityManager->remove($participant);
+        $this->entityManager->flush();
+        
+        $this->addFlash('success', sprintf('Removed %s from tournament.', $participantName));
+        return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+    }
+
+    #[Route('/tournaments/{id}/close', name: 'app_tournament_close', methods: ['POST'])]
+    public function closeTournament(int $id): Response
+    {
+        $tournament = $this->tournamentRepository->find($id);
+        if (!$tournament) {
+            throw $this->createNotFoundException('Tournament not found');
+        }
+        
+        $user = $this->getUser();
+        if ($tournament->getCreator()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'Only the tournament creator can close it.');
+            return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+        }
+        
+        if ($tournament->getState() === 'completed') {
+            $this->addFlash('warning', 'Tournament is already closed.');
+            return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
+        }
+        
+        $tournament->setState('completed');
+        $this->entityManager->persist($tournament);
+        $this->entityManager->flush();
+        
+        $this->addFlash('success', 'Tournament closed.');
         return $this->redirectToRoute('app_tournament_view', ['id' => $id]);
     }
 }

@@ -38,9 +38,16 @@ class Decklist
     #[ORM\OneToMany(targetEntity: TournamentParticipant::class, mappedBy: 'decklist')]
     private Collection $tournamentParticipants;
 
+    /**
+     * @var Collection<int, DeckCard>
+     */
+    #[ORM\OneToMany(targetEntity: DeckCard::class, mappedBy: 'decklist', cascade: ['persist', 'remove'])]
+    private Collection $deckCards;
+
     public function __construct()
     {
         $this->tournamentParticipants = new ArrayCollection();
+        $this->deckCards = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -132,6 +139,36 @@ class Decklist
             // set the owning side to null (unless already changed)
             if ($tournamentParticipant->getDecklist() === $this) {
                 $tournamentParticipant->setDecklist(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeckCard>
+     */
+    public function getDeckCards(): Collection
+    {
+        return $this->deckCards;
+    }
+
+    public function addDeckCard(DeckCard $deckCard): static
+    {
+        if (!$this->deckCards->contains($deckCard)) {
+            $this->deckCards->add($deckCard);
+            $deckCard->setDecklist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeckCard(DeckCard $deckCard): static
+    {
+        if ($this->deckCards->removeElement($deckCard)) {
+            // set the owning side to null (unless already changed)
+            if ($deckCard->getDecklist() === $this) {
+                $deckCard->setDecklist(null);
             }
         }
 

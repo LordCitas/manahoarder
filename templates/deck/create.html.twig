@@ -103,6 +103,11 @@
                         <option value="5">5</option>
                         <option value="6">6</option>
                     </select>
+                    <div class="ml-auto flex items-center gap-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk']">Add to:</label>
+                        <button id="mainDeckToggle" class="bg-[#FF8C00] text-black px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all">Main Deck</button>
+                        <button id="sideboardToggle" class="bg-zinc-900 border border-[#2A2A2A] text-zinc-300 px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:border-[#FF8C00]/50 transition-all">Sideboard</button>
+                    </div>
                 </div>
 
                 <!-- Search Results -->
@@ -119,6 +124,18 @@
 
             <!-- Right Panel - Deck Cards -->
             <div id="deckSidebar">
+                <!-- Import and Save Buttons -->
+                <div class="flex gap-2 mb-4">
+                    <button id="importDeckBtn" class="flex-1 bg-zinc-900 hover:bg-zinc-800 border border-[#2A2A2A] text-zinc-300 px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">upload</span>
+                        Import
+                    </button>
+                    <button id="saveDeckBtn" class="flex-1 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 hover:shadow-lg">
+                        <span class="material-symbols-outlined text-sm">save</span>
+                        Save
+                    </button>
+                </div>
+
                 <!-- View Toggle -->
                 <div class="flex gap-2 mb-4">
                     <button id="viewListBtn" class="flex-1 bg-[#FF8C00] text-black px-4 py-2 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
@@ -145,8 +162,12 @@
 
                         <!-- Stats -->
                         <div class="flex justify-between">
-                            <span class="text-zinc-400">Total Cards:</span>
+                            <span class="text-zinc-400">Main Deck:</span>
                             <span class="text-[#FF8C00] font-bold" id="deckTotal">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-400">Sideboard:</span>
+                            <span class="text-[#FF8C00] font-bold" id="sideboardTotal">0</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-zinc-400">Unique Cards:</span>
@@ -161,11 +182,24 @@
 
                 <!-- Deck Cards List View -->
                 <div class="bg-[rgba(18,18,18,0.7)] backdrop-blur-xl border border-[#2A2A2A] rounded-xl overflow-hidden" id="deckListContainer">
-                    <div class="p-4 border-b border-[#2A2A2A]">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 font-['Space_Grotesk']">Deck Cards</h3>
+                    <!-- Main Deck Section -->
+                    <div>
+                        <div class="p-4 border-b border-[#2A2A2A] bg-zinc-900/50">
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-[#FF8C00] font-['Space_Grotesk']">Main Deck</h3>
+                        </div>
+                        <div id="deckCardsList" class="max-h-[200px] overflow-y-auto">
+                            <p class="text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>
+                        </div>
                     </div>
-                    <div id="deckCardsList" class="max-h-[400px] overflow-y-auto">
-                        <p class="text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>
+
+                    <!-- Sideboard Section -->
+                    <div class="border-t border-[#2A2A2A]">
+                        <div class="p-4 border-b border-[#2A2A2A] bg-zinc-900/50">
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-purple-400 font-['Space_Grotesk']">Sideboard</h3>
+                        </div>
+                        <div id="sideboardCardsList" class="max-h-[150px] overflow-y-auto">
+                            <p class="text-zinc-400 text-center py-8 text-sm">No sideboard cards. Add cards to your sideboard!</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,18 +217,6 @@
                     <p class="col-span-full text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>
                 </div>
             </div>
-        </div>
-
-        <!-- Import and Save Buttons -->
-        <div class="flex gap-2 mt-4">
-            <button id="importDeckBtn" class="flex-1 bg-zinc-900 hover:bg-zinc-800 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined">upload</span>
-                Import Deck
-            </button>
-            <button class="flex-1 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 hover:shadow-lg">
-                <span class="material-symbols-outlined">save</span>
-                Save Deck
-            </button>
         </div>
 
         <!-- Import Deck Modal -->
@@ -226,6 +248,42 @@
             </div>
         </div>
 
+        <!-- Save Deck Modal -->
+        <div id="saveModal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-[#1A1B1E] border border-[#2A2A2A] rounded-xl max-w-xl w-full">
+                <div class="p-6 border-b border-[#2A2A2A] flex items-center justify-between sticky top-0 bg-[#1A1B1E]">
+                    <h2 class="text-lg font-bold uppercase tracking-widest text-[#FF8C00] font-['Space_Grotesk']">Save Deck</h2>
+                    <button onclick="closeSaveModal()" class="text-zinc-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <p class="text-zinc-300 text-sm">Give your deck a name to save it.</p>
+                    
+                    <input 
+                        id="deckNameInput" 
+                        type="text" 
+                        placeholder="Enter deck name..." 
+                        class="w-full bg-[#121212] border border-[#2A2A2A] rounded-lg p-3 text-sm text-zinc-200 placeholder-zinc-600 focus:border-[#FF8C00] outline-none"
+                        maxlength="255"
+                    >
+                    
+                    <div id="saveError" class="hidden bg-red-600/20 border border-red-600/50 text-red-400 p-3 rounded-lg text-sm"></div>
+                    <div id="saveSuccess" class="hidden bg-green-600/20 border border-green-600/50 text-green-400 p-3 rounded-lg text-sm"></div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="saveDeck()" class="flex-1 bg-[#FF8C00] hover:bg-[#ff9d26] text-black px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all">
+                            Save Deck
+                        </button>
+                        <button onclick="closeSaveModal()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 border border-[#2A2A2A] text-zinc-300 px-6 py-3 rounded-lg font-['Space_Grotesk'] text-sm font-bold uppercase tracking-wider transition-all">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 </main>
 
 <script>
@@ -233,6 +291,7 @@
     let deckCards = {};
     let currentView = 'list';
     let selectedFormat = null;
+    let addToSideboard = false;
     const deckFormatSelect = document.getElementById('deckFormat');
     const deckContent = document.getElementById('deckContent');
     const searchPanel = document.getElementById('searchPanel');
@@ -241,14 +300,34 @@
     const columnsSelector = document.getElementById('columnsSelector');
     const searchResults = document.getElementById('searchResults');
     const deckCardsList = document.getElementById('deckCardsList');
+    const sideboardCardsList = document.getElementById('sideboardCardsList');
     const deckCardsGrid = document.getElementById('deckCardsGrid');
     const deckListContainer = document.getElementById('deckListContainer');
     const deckGridContainer = document.getElementById('deckGridContainer');
     const viewListBtn = document.getElementById('viewListBtn');
     const viewGridBtn = document.getElementById('viewGridBtn');
+    const mainDeckToggle = document.getElementById('mainDeckToggle');
+    const sideboardToggle = document.getElementById('sideboardToggle');
     const mainContainer = document.getElementById('mainContainer');
     
     let searchTimeout;
+
+    // Sideboard toggle handlers
+    mainDeckToggle.addEventListener('click', function() {
+        addToSideboard = false;
+        mainDeckToggle.classList.add('bg-[#FF8C00]', 'text-black');
+        mainDeckToggle.classList.remove('bg-zinc-900', 'border', 'text-zinc-300', 'border-[#2A2A2A]');
+        sideboardToggle.classList.remove('bg-[#FF8C00]', 'text-black');
+        sideboardToggle.classList.add('bg-zinc-900', 'border', 'border-[#2A2A2A]', 'text-zinc-300');
+    });
+
+    sideboardToggle.addEventListener('click', function() {
+        addToSideboard = true;
+        sideboardToggle.classList.add('bg-[#FF8C00]', 'text-black');
+        sideboardToggle.classList.remove('bg-zinc-900', 'border', 'text-zinc-300', 'border-[#2A2A2A]');
+        mainDeckToggle.classList.remove('bg-[#FF8C00]', 'text-black');
+        mainDeckToggle.classList.add('bg-zinc-900', 'border', 'border-[#2A2A2A]', 'text-zinc-300');
+    });
 
     // Format selection handler
     deckFormatSelect.addEventListener('change', function(e) {
@@ -274,6 +353,7 @@
             deckFormatSelect.disabled = false;
             deckFormatSelect.classList.remove('opacity-60', 'cursor-not-allowed');
             deckCards = {};
+            addToSideboard = false;
             updateDeckDisplay();
         }
     });
@@ -320,10 +400,8 @@
                             <div class="relative aspect-[5/7] overflow-hidden bg-zinc-900 rounded-xl">
                                 <img alt="${card.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded-xl" src="${card.image}"/>
                             </div>
-                            </div>
                             <div class="p-2">
                                 <h4 class="font-['Space_Grotesk'] text-xs font-semibold text-white line-clamp-2">${card.name}</h4>
-                                <p class="text-xs text-zinc-400 uppercase">${card.mana_cost}</p>
                             </div>
                         </div>
                     `).join('');
@@ -347,18 +425,29 @@
                 name: name,
                 image: image,
                 manaCost: manaCost,
-                count: 0
+                mainDeck: 0,
+                sideboard: 0
             };
         }
-        deckCards[id].count++;
+        
+        if (addToSideboard) {
+            deckCards[id].sideboard++;
+        } else {
+            deckCards[id].mainDeck++;
+        }
         updateDeckDisplay();
     }
 
     // Remove card from deck
-    function removeCardFromDeck(id) {
+    function removeCardFromDeck(id, section = 'main') {
         if (deckCards[id]) {
-            deckCards[id].count--;
-            if (deckCards[id].count <= 0) {
+            if (section === 'sideboard') {
+                deckCards[id].sideboard--;
+            } else {
+                deckCards[id].mainDeck--;
+            }
+            
+            if (deckCards[id].mainDeck <= 0 && deckCards[id].sideboard <= 0) {
                 delete deckCards[id];
             }
             updateDeckDisplay();
@@ -368,46 +457,73 @@
     // Update deck display
     function updateDeckDisplay() {
         const cards = Object.entries(deckCards);
-        const totalCards = cards.reduce((sum, [_, card]) => sum + card.count, 0);
+        const mainDeckCards = cards.filter(([_, card]) => card.mainDeck > 0);
+        const sideboardCards = cards.filter(([_, card]) => card.sideboard > 0);
+        
+        const totalMainDeck = mainDeckCards.reduce((sum, [_, card]) => sum + card.mainDeck, 0);
+        const totalSideboard = sideboardCards.reduce((sum, [_, card]) => sum + card.sideboard, 0);
         const uniqueCards = cards.length;
 
         // Update stats
-        document.getElementById('deckTotal').textContent = totalCards;
+        document.getElementById('deckTotal').textContent = totalMainDeck;
+        document.getElementById('sideboardTotal').textContent = totalSideboard;
         document.getElementById('deckUnique').textContent = uniqueCards;
 
-        // Update list view
-        if (cards.length === 0) {
+        // Update main deck list view
+        if (mainDeckCards.length === 0) {
             deckCardsList.innerHTML = '<p class="text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>';
-            deckCardsGrid.innerHTML = '<p class="col-span-full text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>';
         } else {
-            deckCardsList.innerHTML = cards.map(([id, card]) => `
+            deckCardsList.innerHTML = mainDeckCards.map(([id, card]) => `
                 <div class="flex items-center justify-between p-3 border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
                     <div class="flex-1">
                         <h4 class="font-['Space_Grotesk'] text-sm font-semibold text-white">${card.name}</h4>
                         <p class="text-xs text-zinc-400">${card.manaCost}</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="removeCardFromDeck('${id}')" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-2 py-1 rounded text-xs transition-colors">−</button>
-                        <span class="text-[#FF8C00] font-bold w-6 text-center">${card.count}</span>
+                        <button onclick="removeCardFromDeck('${id}', 'main')" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-2 py-1 rounded text-xs transition-colors">−</button>
+                        <span class="text-[#FF8C00] font-bold w-6 text-center">${card.mainDeck}</span>
                         <button onclick="addCardToDeck('${id}', '${card.name.replace(/'/g, "\\'")}', '${card.image.replace(/'/g, "\\'")}', '${card.manaCost.replace(/'/g, "\\'")}')" class="bg-green-600/20 hover:bg-green-600/40 text-green-400 px-2 py-1 rounded text-xs transition-colors">+</button>
                     </div>
                 </div>
             `).join('');
-
-            const cols = columnsSelector.value;
-            deckCardsGrid.innerHTML = cards.flatMap(([id, card]) => {
-                const copies = [];
-                for (let i = 0; i < card.count; i++) {
-                    copies.push(`
-                        <div class="relative group cursor-pointer" onclick="removeCardFromDeck('${id}')">
-                            <img alt="${card.name}" class="w-full rounded-lg border border-[#2A2A2A] group-hover:border-red-600/50 transition-colors" src="${card.image}"/>
-                            <div class="absolute top-1 right-1 bg-red-600 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">Remove</div>
-                        </div>
-                    `);
-                }
-                return copies;
-            }).join('');
         }
+
+        // Update sideboard list view
+        if (sideboardCards.length === 0) {
+            sideboardCardsList.innerHTML = '<p class="text-zinc-400 text-center py-8 text-sm">No sideboard cards. Add cards to your sideboard!</p>';
+        } else {
+            sideboardCardsList.innerHTML = sideboardCards.map(([id, card]) => `
+                <div class="flex items-center justify-between p-3 border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
+                    <div class="flex-1">
+                        <h4 class="font-['Space_Grotesk'] text-sm font-semibold text-white">${card.name}</h4>
+                        <p class="text-xs text-zinc-400">${card.manaCost}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="removeCardFromDeck('${id}', 'sideboard')" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-2 py-1 rounded text-xs transition-colors">−</button>
+                        <span class="text-purple-400 font-bold w-6 text-center">${card.sideboard}</span>
+                        <button onclick="addCardToSideboard('${id}', '${card.name.replace(/'/g, "\\'")}', '${card.image.replace(/'/g, "\\'")}', '${card.manaCost.replace(/'/g, "\\'")}')" class="bg-green-600/20 hover:bg-green-600/40 text-green-400 px-2 py-1 rounded text-xs transition-colors">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update grid view
+        updateGridView();
+    }
+
+    // Helper function to add card specifically to sideboard
+    function addCardToSideboard(id, name, image, manaCost) {
+        if (!deckCards[id]) {
+            deckCards[id] = {
+                name: name,
+                image: image,
+                manaCost: manaCost,
+                mainDeck: 0,
+                sideboard: 0
+            };
+        }
+        deckCards[id].sideboard++;
+        updateDeckDisplay();
     }
 
     // View toggle
@@ -446,17 +562,22 @@
         const cards = Object.entries(deckCards);
         const deckCardsGrid = document.getElementById('deckCardsGrid');
         
-        if (cards.length === 0) {
+        const mainDeckCards = cards.filter(([_, card]) => card.mainDeck > 0);
+        const sideboardCards = cards.filter(([_, card]) => card.sideboard > 0);
+        const allCards = mainDeckCards.concat(sideboardCards);
+        
+        if (allCards.length === 0) {
             deckCardsGrid.innerHTML = '<p class="col-span-full text-zinc-400 text-center py-8 text-sm">No cards yet. Search and add cards!</p>';
             return;
         }
 
         let stacksHtml = '';
-        cards.forEach(([id, card]) => {
+        allCards.forEach(([id, card]) => {
+            const totalCount = card.mainDeck + card.sideboard;
             // Create stacks of up to 4 cards
-            const numStacks = Math.ceil(card.count / 4);
+            const numStacks = Math.ceil(totalCount / 4);
             for (let stack = 0; stack < numStacks; stack++) {
-                const cardsInStack = Math.min(4, card.count - (stack * 4));
+                const cardsInStack = Math.min(4, totalCount - (stack * 4));
                 let stackHtml = '<div class="relative" style="width: 180px; height: 250px;">';
                 
                 for (let i = 0; i < cardsInStack; i++) {
@@ -554,8 +675,28 @@
                     name: card.name,
                     image: card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal || '',
                     manaCost: card.mana_cost || '',
-                    count: count
+                    mainDeck: count,
+                    sideboard: 0
                 };
+            }
+
+            // Import sideboard cards
+            for (const [cardName, count] of Object.entries(sideboard)) {
+                const cards = await searchCardByName(cardName);
+                if (cards && cards.length > 0) {
+                    const card = cards[0];
+                    if (importedCards[card.id]) {
+                        importedCards[card.id].sideboard = count;
+                    } else {
+                        importedCards[card.id] = {
+                            name: card.name,
+                            image: card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal || '',
+                            manaCost: card.mana_cost || '',
+                            mainDeck: 0,
+                            sideboard: count
+                        };
+                    }
+                }
             }
 
             if (hasIllegalCards) {
@@ -590,6 +731,116 @@
         } catch (error) {
             console.error('Search error:', error);
             return [];
+        }
+    }
+
+    // Save Deck functionality
+    const saveModal = document.getElementById('saveModal');
+    const deckNameInput = document.getElementById('deckNameInput');
+    const saveError = document.getElementById('saveError');
+    const saveSuccess = document.getElementById('saveSuccess');
+    const saveDeckBtn = document.getElementById('saveDeckBtn');
+    
+    saveDeckBtn.addEventListener('click', function() {
+        if (!selectedFormat) {
+            alert('Please select a format first');
+            return;
+        }
+        if (Object.keys(deckCards).length === 0) {
+            alert('Your deck is empty. Please add cards first');
+            return;
+        }
+        
+        saveModal.classList.remove('hidden');
+        deckNameInput.focus();
+        clearSaveModal();
+    });
+
+    function closeSaveModal() {
+        saveModal.classList.add('hidden');
+        deckNameInput.value = '';
+        saveError.classList.add('hidden');
+        saveSuccess.classList.add('hidden');
+    }
+
+    function clearSaveModal() {
+        saveError.classList.add('hidden');
+        saveSuccess.classList.add('hidden');
+    }
+
+    function showSaveError(message) {
+        saveError.textContent = message;
+        saveError.classList.remove('hidden');
+        saveSuccess.classList.add('hidden');
+    }
+
+    function showSaveSuccess(message) {
+        saveSuccess.textContent = message;
+        saveSuccess.classList.remove('hidden');
+        saveError.classList.add('hidden');
+    }
+
+    async function saveDeck() {
+        const deckName = deckNameInput.value.trim();
+
+        if (!deckName) {
+            showSaveError('Deck name is required');
+            return;
+        }
+
+        if (!selectedFormat) {
+            showSaveError('Format is required');
+            return;
+        }
+
+        const mainDeck = {};
+        const sideboard = {};
+
+        Object.entries(deckCards).forEach(([cardId, card]) => {
+            if (card.mainDeck > 0) {
+                mainDeck[cardId] = card.mainDeck;
+            }
+            if (card.sideboard > 0) {
+                sideboard[cardId] = card.sideboard;
+            }
+        });
+
+        if (Object.keys(mainDeck).length === 0) {
+            showSaveError('Main deck cannot be empty');
+            return;
+        }
+
+        try {
+            const response = await fetch('{{ path("app_deck_save") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    name: deckName,
+                    format: selectedFormat,
+                    mainDeck: mainDeck,
+                    sideboard: sideboard
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showSaveError(data.error || 'Error saving deck');
+                return;
+            }
+
+            showSaveSuccess('Deck saved successfully! Redirecting...');
+            
+            setTimeout(() => {
+                window.location.href = '{{ path("app_decks") }}';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Save error:', error);
+            showSaveError('Error saving deck: ' + error.message);
         }
     }
 </script>
