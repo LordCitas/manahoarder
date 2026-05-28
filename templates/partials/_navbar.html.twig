@@ -38,23 +38,19 @@
                     <span class="material-symbols-outlined text-xl">search</span>
                 </button>
 
-                {# Notifications Icon #}
-                <button class="text-zinc-400 hover:text-[#FF8C00] transition-colors relative">
-                    <span class="material-symbols-outlined text-xl">notifications</span>
-                    {# Notification badge (optional) #}
-                    {# <span class="absolute top-0 right-0 w-2 h-2 bg-[#FF8C00] rounded-full"></span> #}
-                </button>
-
-                {# Settings Icon #}
-                <a href="{{ path('app_settings') }}" class="text-zinc-400 hover:text-[#FF8C00] transition-colors">
-                    <span class="material-symbols-outlined text-xl">settings</span>
-                </a>
-
                 {# Profile Icon #}
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <div class="relative group">
                         <button class="text-zinc-400 hover:text-[#FF8C00] transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined text-xl">account_circle</span>
+                            {% if app.user.profileArtUrl %}
+                                <img src="{{ app.user.profileArtUrl }}" alt="{{ app.user.nickname }}" class="w-8 h-8 rounded-lg border border-[#FF8C00] object-cover">
+                            {% elseif app.user.profilePictureFilename %}
+                                <img src="/uploads/profile-pictures/{{ app.user.profilePictureFilename }}" alt="{{ app.user.nickname }}" class="w-8 h-8 rounded-lg border border-[#FF8C00] object-cover">
+                            {% else %}
+                                <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-[#2A2A2A] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-zinc-500" style="font-size: 18px;">person</span>
+                                </div>
+                            {% endif %}
                         </button>
                         <div class="absolute right-0 top-full mt-2 w-48 bg-[#121212] border border-[#2A2A2A] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                             <div class="p-3 border-b border-[#2A2A2A]">
@@ -75,10 +71,6 @@
                             <a href="{{ path('app_profile') }}" class="block px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2">
                                 <span class="material-symbols-outlined text-sm">person</span>
                                 Profile
-                            </a>
-                            <a href="{{ path('app_settings') }}" class="block px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sm">settings</span>
-                                Settings
                             </a>
                             <a href="{{ path('app_logout') }}" class="block px-3 py-2 text-xs text-red-400 hover:bg-zinc-800 transition-colors flex items-center gap-2">
                                 <span class="material-symbols-outlined text-sm">logout</span>

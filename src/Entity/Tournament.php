@@ -53,6 +53,9 @@ class Tournament
     #[ORM\Column(nullable: true)]
     private ?int $currentRound = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $artUrl = null;
+
     public function __construct()
     {
         $this->tournamentParticipants = new ArrayCollection();
@@ -209,6 +212,18 @@ class Tournament
     public function setCurrentRound(?int $currentRound): static
     {
         $this->currentRound = $currentRound;
+
+        return $this;
+    }
+
+    public function getArtUrl(): ?string
+    {
+        return $this->artUrl;
+    }
+
+    public function setArtUrl(?string $artUrl): static
+    {
+        $this->artUrl = $artUrl;
 
         return $this;
     }

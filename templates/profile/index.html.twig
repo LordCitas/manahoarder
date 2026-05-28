@@ -36,18 +36,18 @@
                     
                     <div class="flex flex-col items-center mb-6">
                         {% if user.profileArtUrl %}
-                            <img src="{{ user.profileArtUrl }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
+                            <img id="profilePictureImage" src="{{ user.profileArtUrl }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
                         {% elseif user.profilePictureFilename %}
-                            <img src="/uploads/profile-pictures/{{ user.profilePictureFilename }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
+                            <img id="profilePictureImage" src="/uploads/profile-pictures/{{ user.profilePictureFilename }}" alt="{{ user.nickname }}" class="w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3">
                         {% else %}
-                            <div class="w-32 h-32 rounded-lg bg-zinc-800 border-2 border-[#2A2A2A] flex items-center justify-center mb-3">
+                            <div id="profilePictureImage" class="w-32 h-32 rounded-lg bg-zinc-800 border-2 border-[#2A2A2A] flex items-center justify-center mb-3">
                                 <span class="material-symbols-outlined text-zinc-500" style="font-size: 80px;">person</span>
                             </div>
                         {% endif %}
                         <p class="text-base text-white font-semibold font-['Space_Grotesk']">{{ user.nickname }}</p>
                         <p class="text-xs text-zinc-500">{{ user.email }}</p>
                     </div>
-
+                    
                     <button onclick="document.getElementById('pictureModal').classList.remove('hidden')" class="w-full bg-[#FF8C00] text-black px-4 py-2.5 rounded font-['Space_Grotesk'] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all">
                         Change Picture
                     </button>
@@ -183,8 +183,18 @@
             </button>
         </div>
 
-        <!-- Card Art Selection -->
-        <div id="cardArtContent">
+        <!-- Tab Navigation -->
+        <div class="flex gap-4 mb-6 border-b border-[#2A2A2A]">
+            <button onclick="switchTab('collection')" class="tab-button active text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-[#FF8C00] pb-3 px-2 transition-colors font-['Space_Grotesk']" data-tab="collection">
+                Your Collection
+            </button>
+            <button onclick="switchTab('search')" class="tab-button text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-[#FF8C00] pb-3 px-2 transition-colors font-['Space_Grotesk']" data-tab="search">
+                Search Scryfall
+            </button>
+        </div>
+
+        <!-- Collection Tab -->
+        <div id="tab-collection" class="tab-content">
             <div class="mb-4">
                 <p class="text-xs text-zinc-400 font-['Space_Grotesk'] mb-3">Select from your card collection:</p>
                 <div id="cardArtResults" class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
@@ -194,7 +204,7 @@
                             {% if card.artCropUrl %}
                                 <button 
                                     type="button"
-                                    onclick="selectCardArt({{ card.id }}, '{{ card.artCropUrl }}', '{{ card.name }}')"
+                                    onclick="selectCardArt('{{ card.artCropUrl }}', '{{ card.name }}')"
                                     class="group relative overflow-hidden rounded border-2 border-[#2A2A2A] hover:border-[#FF8C00] transition-all"
                                     title="{{ card.name }}"
                                 >
@@ -211,59 +221,155 @@
                 </div>
             </div>
         </div>
+
+        <!-- Search Tab -->
+        <div id="tab-search" class="tab-content hidden">
+            <div class="mb-4">
+                <div class="mb-4">
+                    <input 
+                        type="text" 
+                        id="artSearchInput"
+                        placeholder="Search for cards (e.g., 'Black Lotus', 'Mana Drain')" 
+                        class="w-full bg-[#121212] border border-[#2A2A2A] py-2.5 px-3 text-sm text-zinc-200 placeholder-zinc-600 font-['Space_Grotesk'] tracking-wide focus:border-[#FF8C00] outline-none rounded"
+                    >
+                    <p class="mt-1 text-xs text-zinc-500">Search for any Magic card to use its art as your profile picture</p>
+                </div>
+                
+                <div id="searchResults" class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                    <p class="col-span-full text-center text-sm text-zinc-500 py-8">Enter a card name to search</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
+    // Tab switching
+    function switchTab(tab) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        
+        // Deactivate all buttons
+        document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+        
+        // Show selected tab
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        
+        // Activate selected button
+        event.target.classList.add('active');
+    }
+
+    // Search for cards on Scryfall
+    const searchInput = document.getElementById('artSearchInput');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            
+            const query = this.value.trim();
+            if (query.length < 2) {
+                document.getElementById('searchResults').innerHTML = '<p class="col-span-full text-center text-sm text-zinc-500 py-8">Enter a card name to search</p>';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`{{ path('app_profile_search_art') }}?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsDiv = document.getElementById('searchResults');
+                        
+                        if (data.data.length === 0) {
+                            resultsDiv.innerHTML = '<p class="col-span-full text-center text-sm text-zinc-500 py-8">No cards found with art</p>';
+                            return;
+                        }
+                        
+                        resultsDiv.innerHTML = data.data.map(card => `
+                            <button 
+                                type="button"
+                                onclick="selectCardArt('${card.artCropUrl}', '${card.name}')"
+                                class="group relative overflow-hidden rounded border-2 border-[#2A2A2A] hover:border-[#FF8C00] transition-all"
+                                title="${card.name}"
+                            >
+                                <img src="${card.artCropUrl}" alt="${card.name}" class="w-full h-auto aspect-[3/4] object-cover group-hover:opacity-80 transition-opacity">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[#FF8C00] text-xl">check_circle</span>
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 bg-black/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <p class="text-xs text-white truncate">${card.name}</p>
+                                </div>
+                            </button>
+                        `).join('');
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        document.getElementById('searchResults').innerHTML = '<p class="col-span-full text-center text-sm text-red-500 py-8">Error searching cards</p>';
+                    });
+            }, 300);
+        });
+    }
+
     // Select card art
-    function selectCardArt(cardId, artUrl, cardName) {
+    function selectCardArt(artUrl, cardName) {
         const modal = document.getElementById('pictureModal');
+        const imageEl = document.getElementById('profilePictureImage');
         
         // Show loading state
         const selectedButton = event.target.closest('button');
         selectedButton.classList.add('opacity-50', 'cursor-wait');
         
-        fetch('{{ path('app_profile_set_card_art', {cardId: 0}) }}'.replace('0', cardId), {
+        fetch('{{ path('app_profile_update_profile_art') }}', {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                artUrl: artUrl,
+                cardName: cardName,
+            }),
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 // Update profile picture immediately
-                const profileImg = document.querySelector('.w-32.h-32.rounded-lg');
-                if (profileImg && profileImg.tagName === 'IMG') {
-                    profileImg.src = artUrl;
+                if (imageEl.tagName === 'IMG') {
+                    imageEl.src = artUrl;
+                } else {
+                    // Replace the placeholder div with an image
+                    const newImg = document.createElement('img');
+                    newImg.id = 'profilePictureImage';
+                    newImg.src = artUrl;
+                    newImg.alt = cardName;
+                    newImg.className = 'w-32 h-32 rounded-lg border-2 border-[#FF8C00] object-cover mb-3';
+                    imageEl.replaceWith(newImg);
                 }
                 
                 // Show success message
                 const successMsg = document.createElement('div');
-                successMsg.className = 'fixed top-4 right-4 bg-green-900/20 border border-green-900/60 text-green-100 px-6 py-4 rounded-xl flex items-center gap-3 z-50 animate-pulse';
+                successMsg.className = 'fixed top-4 right-4 bg-green-900/20 border border-green-900/60 text-green-100 px-6 py-4 rounded-xl flex items-center gap-3 z-50';
                 successMsg.innerHTML = `<span class="material-symbols-outlined text-green-500">check_circle</span><span class="font-['Space_Grotesk'] text-sm">Profile picture updated with ${cardName}</span>`;
                 document.body.appendChild(successMsg);
                 
                 setTimeout(() => successMsg.remove(), 3000);
                 setTimeout(() => modal.classList.add('hidden'), 500);
             } else {
-                alert('Failed to update profile picture: ' + data.message);
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'fixed top-4 right-4 bg-red-900/20 border border-red-900/60 text-red-100 px-6 py-4 rounded-xl flex items-center gap-3 z-50';
+                errorMsg.innerHTML = `<span class="material-symbols-outlined text-red-500">error</span><span class="font-['Space_Grotesk'] text-sm">Failed to update profile picture</span>`;
+                document.body.appendChild(errorMsg);
+                setTimeout(() => errorMsg.remove(), 3000);
+                selectedButton.classList.remove('opacity-50', 'cursor-wait');
             }
-            selectedButton.classList.remove('opacity-50', 'cursor-wait');
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to update profile picture');
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'fixed top-4 right-4 bg-red-900/20 border border-red-900/60 text-red-100 px-6 py-4 rounded-xl flex items-center gap-3 z-50';
+            errorMsg.innerHTML = `<span class="material-symbols-outlined text-red-500">error</span><span class="font-['Space_Grotesk'] text-sm">Error updating profile picture</span>`;
+            document.body.appendChild(errorMsg);
+            setTimeout(() => errorMsg.remove(), 3000);
             selectedButton.classList.remove('opacity-50', 'cursor-wait');
         });
     }
-
-    // Close modal
-    document.getElementById('pictureModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.add('hidden');
-        }
-    });
 </script>
 {% endblock %}

@@ -52,25 +52,37 @@
                     <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white uppercase tracking-tight mb-6">My Tournaments</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for tournament in myTournaments %}
-                            <a href="{{ path('app_tournament_view', {id: tournament.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded-xl p-5 group">
-                                <div class="flex items-start justify-between mb-4">
-                                    <h3 class="font-['Space_Grotesk'] text-lg font-semibold text-white group-hover:text-[#FF8C00] transition-colors">{{ tournament.name }}</h3>
-                                    <span class="bg-[#FF8C00] text-black px-2 py-1 rounded text-xs font-bold uppercase tracking-wider font-['Space_Grotesk']">{{ tournament.format }}</span>
-                                </div>
-                                <div class="space-y-2 mb-4">
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">group</span>
-                                        <span class="font-['Space_Grotesk']">{{ tournament.tournamentParticipants|length }} participants</span>
+                            <a href="{{ path('app_tournament_view', {id: tournament.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded-xl overflow-hidden group">
+                                {% if tournament.artUrl %}
+                                    <div class="relative overflow-hidden h-32 bg-zinc-900">
+                                        <img src="{{ tournament.artUrl }}" alt="{{ tournament.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                                        <div class="absolute inset-0 bg-black/40"></div>
                                     </div>
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">calendar_today</span>
-                                        <span class="font-['Space_Grotesk']">{{ tournament.createdAt|date('M d, Y') }}</span>
+                                {% else %}
+                                    <div class="h-32 bg-gradient-to-br from-[#FF8C00]/20 to-zinc-900 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[#FF8C00] opacity-50" style="font-size: 48px;">sports_soccer</span>
                                     </div>
-                                </div>
-                                <div class="pt-3 border-t border-zinc-800">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs text-zinc-500 font-['Space_Grotesk']">Tournament Code</span>
-                                        <span class="text-sm text-[#FF8C00] font-bold font-['Space_Grotesk'] tracking-wider">{{ tournament.inviteCode }}</span>
+                                {% endif %}
+                                <div class="p-5 flex flex-col h-full">
+                                    <div class="flex items-start justify-between gap-2 mb-3">
+                                        <h3 class="font-['Space_Grotesk'] text-base font-semibold text-white group-hover:text-[#FF8C00] transition-colors line-clamp-1 flex-1">{{ tournament.name }}</h3>
+                                        <span class="bg-[#FF8C00] text-black px-2 py-1 rounded text-xs font-bold uppercase tracking-wider font-['Space_Grotesk'] whitespace-nowrap flex-shrink-0">{{ tournament.format }}</span>
+                                    </div>
+                                    <div class="space-y-1 mb-3 text-sm text-zinc-400 flex-1">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="material-symbols-outlined text-sm flex-shrink-0">group</span>
+                                            <span class="font-['Space_Grotesk']">{{ tournament.tournamentParticipants|length }} participants</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="material-symbols-outlined text-sm flex-shrink-0">calendar_today</span>
+                                            <span class="font-['Space_Grotesk']">{{ tournament.createdAt|date('M d, Y') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 border-t border-zinc-800 mt-auto">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-zinc-500 font-['Space_Grotesk']">Code</span>
+                                            <span class="text-xs text-[#FF8C00] font-bold font-['Space_Grotesk'] tracking-wider">{{ tournament.inviteCode }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
@@ -85,38 +97,46 @@
                     <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white uppercase tracking-tight mb-6">Joined Tournaments</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for tournament in joinedTournaments %}
-                            <a href="{{ path('app_tournament_view', {id: tournament.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded-xl p-5 group">
-                                <div class="flex items-start justify-between mb-4">
-                                    <h3 class="font-['Space_Grotesk'] text-lg font-semibold text-white group-hover:text-[#FF8C00] transition-colors">{{ tournament.name }}</h3>
-                                    <span class="bg-zinc-900 border border-zinc-700 text-zinc-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider font-['Space_Grotesk']">{{ tournament.format }}</span>
-                                </div>
-                                <div class="space-y-2 mb-4">
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">person</span>
+                            <a href="{{ path('app_tournament_view', {id: tournament.id}) }}" class="bg-[#1A1B1E] border border-[#2A2A2A] hover:border-[#FF8C00]/50 transition-all rounded-xl overflow-hidden group">
+                                {% if tournament.artUrl %}
+                                    <div class="relative overflow-hidden h-32 bg-zinc-900">
+                                        <img src="{{ tournament.artUrl }}" alt="{{ tournament.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                                        <div class="absolute inset-0 bg-black/40"></div>
+                                    </div>
+                                {% else %}
+                                    <div class="h-32 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-zinc-700 opacity-50" style="font-size: 48px;">sports_soccer</span>
+                                    </div>
+                                {% endif %}
+                                <div class="p-5 flex flex-col h-full">
+                                    <div class="flex items-start justify-between gap-2 mb-2">
+                                        <h3 class="font-['Space_Grotesk'] text-base font-semibold text-white group-hover:text-[#FF8C00] transition-colors line-clamp-1 flex-1">{{ tournament.name }}</h3>
+                                        <span class="bg-zinc-900 border border-zinc-700 text-zinc-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider font-['Space_Grotesk'] whitespace-nowrap flex-shrink-0">{{ tournament.format }}</span>
+                                    </div>
+                                    <div class="space-y-1 mb-2 text-xs text-zinc-400 flex-1">
                                         <div class="flex items-center gap-2">
-                                            {% if tournament.creator.profileArtUrl %}
-                                                <img src="{{ tournament.creator.profileArtUrl }}" alt="{{ tournament.creator.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A]">
-                                            {% elseif tournament.creator.profilePictureFilename %}
-                                                <img src="/uploads/profile-pictures/{{ tournament.creator.profilePictureFilename }}" alt="{{ tournament.creator.nickname }}" class="w-5 h-5 rounded border border-[#2A2A2A] object-cover">
-                                            {% else %}
-                                                <div class="w-5 h-5 rounded bg-zinc-800 border border-[#2A2A2A] flex items-center justify-center">
-                                                    <span class="material-symbols-outlined text-zinc-500" style="font-size: 14px;">person</span>
-                                                </div>
-                                            {% endif %}
-                                            <span class="font-['Space_Grotesk']">Host: {{ tournament.creator.nickname }}</span>
+                                            <span class="material-symbols-outlined text-sm flex-shrink-0">person</span>
+                                            <div class="flex items-center gap-1 min-w-0">
+                                                {% if tournament.creator.profileArtUrl %}
+                                                    <img src="{{ tournament.creator.profileArtUrl }}" alt="{{ tournament.creator.nickname }}" class="w-4 h-4 rounded border border-[#2A2A2A] flex-shrink-0">
+                                                {% elseif tournament.creator.profilePictureFilename %}
+                                                    <img src="/uploads/profile-pictures/{{ tournament.creator.profilePictureFilename }}" alt="{{ tournament.creator.nickname }}" class="w-4 h-4 rounded border border-[#2A2A2A] object-cover flex-shrink-0">
+                                                {% else %}
+                                                    <div class="w-4 h-4 rounded bg-zinc-800 border border-[#2A2A2A] flex items-center justify-center flex-shrink-0">
+                                                        <span class="material-symbols-outlined text-zinc-500" style="font-size: 12px;">person</span>
+                                                    </div>
+                                                {% endif %}
+                                                <span class="font-['Space_Grotesk'] truncate">{{ tournament.creator.nickname }}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">group</span>
-                                        <span class="font-['Space_Grotesk']">{{ tournament.tournamentParticipants|length }} participants</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">calendar_today</span>
-                                        <span class="font-['Space_Grotesk']">{{ tournament.createdAt|date('M d, Y') }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-sm text-zinc-400">
-                                        <span class="material-symbols-outlined text-base">bookmark</span>
-                                        <span class="font-['Space_Grotesk']">{{ tournament.state|upper }}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm flex-shrink-0">group</span>
+                                            <span class="font-['Space_Grotesk']">{{ tournament.tournamentParticipants|length }} participants</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm flex-shrink-0">bookmark</span>
+                                            <span class="font-['Space_Grotesk']">{{ tournament.state|upper }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>

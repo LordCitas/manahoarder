@@ -218,6 +218,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Get all cards from all user's decklists
+     * @return Collection<int, DeckCard>
+     */
+    public function getUserCards(): Collection
+    {
+        $cards = new ArrayCollection();
+        
+        foreach ($this->decklists as $decklist) {
+            foreach ($decklist->getDeckCards() as $deckCard) {
+                $cards->add($deckCard);
+            }
+        }
+        
+        return $cards;
+    }
+
+    /**
      * @return Collection<int, TournamentParticipant>
      */
     public function getTournamentParticipants(): Collection
